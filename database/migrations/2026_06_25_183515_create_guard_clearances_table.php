@@ -18,7 +18,9 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->string('clearance_type');
+            $table->foreignId('master_clearance_type_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
             $table->string('clearance_number')->nullable();
 

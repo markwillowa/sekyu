@@ -11,31 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('guard_licenses', function (Blueprint $table) {
+        Schema::create('guard_firearm_qualifications', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('guard_profile_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('master_license_type_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
+            $table->boolean('is_firearm_qualified')->default(false);
 
-            $table->string('license_number')->nullable();
+            $table->string('firearm_type')->nullable();
+            $table->string('permit_number')->nullable();
 
             $table->date('issued_at')->nullable();
             $table->date('expires_at')->nullable();
 
             $table->string('issuing_authority')->nullable();
 
-            $table->string('verification_status')
-                ->default('pending');
+            $table->string('training_provider')->nullable();
+            $table->date('training_completed_at')->nullable();
 
+            $table->string('verification_status')->default('pending');
             $table->text('verification_notes')->nullable();
 
             $table->timestamps();
+
+            $table->unique('guard_profile_id');
         });
     }
 
@@ -44,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('guard_licenses');
+        Schema::dropIfExists('guard_firearm_qualifications');
     }
 };

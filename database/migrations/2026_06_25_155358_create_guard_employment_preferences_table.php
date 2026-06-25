@@ -24,8 +24,14 @@ return new class extends Migration
             $table->decimal('expected_salary_min', 10, 2)->nullable();
             $table->decimal('expected_salary_max', 10, 2)->nullable();
 
-            $table->string('employment_type')->nullable();
-            $table->string('preferred_shift')->nullable();
+            $table->foreignId('master_employment_type_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+            $table->foreignId('master_shift_type_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
 
             $table->boolean('willing_to_relocate')->default(false);
             $table->boolean('available_immediately')->default(false);

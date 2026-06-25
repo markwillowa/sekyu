@@ -11,20 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('guard_languages', function (Blueprint $table) {
+        Schema::create('guard_specializations', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('guard_profile_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('master_language_id')
+            $table->foreignId('master_specialization_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('master_language_proficiency_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->unsignedTinyInteger('years_of_experience')
+                ->nullable();
+
+            $table->boolean('primary')
+                ->default(false);
+
+            $table->text('description')
+                ->nullable();
 
             $table->timestamps();
         });
@@ -35,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('guard_languages');
+        Schema::dropIfExists('guard_specializations');
     }
 };

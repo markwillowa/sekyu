@@ -1,33 +1,13 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
+@extends('layouts.app')
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1"
-    >
+@section('content')
 
-    <title>Sekyu</title>
+    @include('public.hero')
 
-    @vite([
-        'resources/css/app.css',
-        'resources/js/app.js',
-    ])
-</head>
-<body class="bg-slate-50 text-slate-900">
+    @include('public.featured-jobs')
 
-@include('public.navbar')
+    @include('public.how-it-works')
 
-@include('public.hero')
+    @include('public.stats')
 
-@include('public.featured-jobs')
-
-@include('public.how-it-works')
-
-@include('public.stats')
-
-@include('public.footer')
-
-</body>
-</html>
+@endsection

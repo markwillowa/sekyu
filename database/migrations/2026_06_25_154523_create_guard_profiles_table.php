@@ -27,8 +27,17 @@ return new class extends Migration
             $table->text('summary')->nullable();
 
             $table->date('birth_date')->nullable();
-            $table->string('gender')->nullable();
-            $table->string('civil_status')->nullable();
+
+            $table->foreignId('master_gender_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
+            $table->foreignId('master_civil_status_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
             $table->string('nationality')->default('Filipino');
 
             $table->timestamps();

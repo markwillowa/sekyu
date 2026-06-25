@@ -13,8 +13,8 @@ class GuardEmploymentPreference extends Model
         'preferred_location',
         'expected_salary_min',
         'expected_salary_max',
-        'employment_type',
-        'preferred_shift',
+        'master_employment_type_id',
+        'master_shift_type_id',
         'willing_to_relocate',
         'available_immediately',
         'available_from',
@@ -31,5 +31,21 @@ class GuardEmploymentPreference extends Model
     public function guardProfile(): BelongsTo
     {
         return $this->belongsTo(GuardProfile::class);
+    }
+
+    public function employmentType(): BelongsTo
+    {
+        return $this->belongsTo(
+            MasterEmploymentType::class,
+            'master_employment_type_id'
+        );
+    }
+
+    public function shiftType(): BelongsTo
+    {
+        return $this->belongsTo(
+            MasterShiftType::class,
+            'master_shift_type_id'
+        );
     }
 }

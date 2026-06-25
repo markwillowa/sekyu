@@ -13,7 +13,7 @@ class GuardClearance extends Model implements HasMedia
 
     protected $fillable = [
         'guard_profile_id',
-        'clearance_type',
+        'master_clearance_type_id',
         'clearance_number',
         'issued_at',
         'expires_at',
@@ -36,5 +36,13 @@ class GuardClearance extends Model implements HasMedia
     {
         $this
             ->addMediaCollection('clearances');
+    }
+
+    public function clearanceType(): BelongsTo
+    {
+        return $this->belongsTo(
+            MasterClearanceType::class,
+            'master_clearance_type_id'
+        );
     }
 }

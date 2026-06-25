@@ -13,6 +13,7 @@ class GuardTraining extends Model implements HasMedia
 
     protected $fillable = [
         'guard_profile_id',
+        'master_training_type_id',
         'title',
         'training_provider',
         'started_at',
@@ -30,6 +31,14 @@ class GuardTraining extends Model implements HasMedia
     public function guardProfile(): BelongsTo
     {
         return $this->belongsTo(GuardProfile::class);
+    }
+
+    public function trainingType(): BelongsTo
+    {
+        return $this->belongsTo(
+            MasterTrainingType::class,
+            'master_training_type_id'
+        );
     }
 
     public function registerMediaCollections(): void

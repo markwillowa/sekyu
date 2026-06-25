@@ -11,20 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('guard_languages', function (Blueprint $table) {
+        Schema::create('guard_emergency_contacts', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('guard_profile_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('master_language_id')
+            $table->string('name');
+            $table->foreignId('master_relationship_id')
+                ->nullable()
                 ->constrained()
-                ->cascadeOnDelete();
+                ->nullOnDelete();
 
-            $table->foreignId('master_language_proficiency_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->string('mobile_number')->nullable();
+            $table->string('alternate_mobile_number')->nullable();
+
+            $table->string('email')->nullable();
+
+            $table->text('address')->nullable();
+
+            $table->boolean('is_primary')->default(false);
 
             $table->timestamps();
         });
@@ -35,6 +42,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('guard_languages');
+        Schema::dropIfExists('guard_emergency_contacts');
     }
 };

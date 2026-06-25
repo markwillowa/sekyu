@@ -5,13 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class GuardSkill extends Model
+class GuardSpecialization extends Model
 {
     protected $fillable = [
         'guard_profile_id',
-        'master_skill_id',
-        'master_skill_level_id',
+        'master_specialization_id',
         'years_of_experience',
+        'primary',
+        'description',
+    ];
+
+    protected $casts = [
+        'primary' => 'boolean',
     ];
 
     public function guardProfile(): BelongsTo
@@ -19,16 +24,11 @@ class GuardSkill extends Model
         return $this->belongsTo(GuardProfile::class);
     }
 
-    public function level(): BelongsTo
+    public function specialization(): BelongsTo
     {
         return $this->belongsTo(
-            MasterSkillLevel::class,
-            'master_skill_level_id'
+            MasterSpecialization::class,
+            'master_specialization_id'
         );
-    }
-
-    public function skill(): BelongsTo
-    {
-        return $this->belongsTo(MasterSkill::class, 'master_skill_id');
     }
 }

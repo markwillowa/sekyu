@@ -18,9 +18,13 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->string('name');
+            $table->foreignId('master_skill_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
-            $table->string('level')->nullable();
+            $table->foreignId('master_skill_level_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
             $table->unsignedTinyInteger('years_of_experience')->nullable();
 

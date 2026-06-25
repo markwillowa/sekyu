@@ -18,6 +18,11 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
+            $table->foreignId('master_training_type_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
             $table->string('title');
 
             $table->string('training_provider')->nullable();

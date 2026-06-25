@@ -22,14 +22,27 @@ class GuardProfile extends Model implements HasMedia
         'headline',
         'summary',
         'birth_date',
-        'gender',
-        'civil_status',
+        'master_gender_id',
+        'master_civil_status_id',
         'nationality',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
     ];
+
+    public function gender(): BelongsTo
+    {
+        return $this->belongsTo(MasterGender::class, 'master_gender_id');
+    }
+
+    public function civilStatus(): BelongsTo
+    {
+        return $this->belongsTo(
+            MasterCivilStatus::class,
+            'master_civil_status_id'
+        );
+    }
 
     public function user(): BelongsTo
     {
@@ -109,6 +122,21 @@ class GuardProfile extends Model implements HasMedia
     public function identifications(): HasMany
     {
         return $this->hasMany(GuardIdentification::class);
+    }
+
+    public function emergencyContacts(): HasMany
+    {
+        return $this->hasMany(GuardEmergencyContact::class);
+    }
+
+    public function firearmQualification(): HasOne
+    {
+        return $this->hasOne(GuardFirearmQualification::class);
+    }
+
+    public function specializations(): HasMany
+    {
+        return $this->hasMany(GuardSpecialization::class);
     }
 
     public function registerMediaCollections(): void
