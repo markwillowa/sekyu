@@ -64,22 +64,22 @@
                             @csrf
 
                             <div>
-                                <label for="email" class="text-lg font-bold text-slate-800">
-                                    Email Address
+                                <label for="username" class="text-lg font-bold text-slate-800">
+                                    Username
                                 </label>
 
                                 <input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    value="{{ old('email') }}"
-                                    placeholder="Enter your email"
+                                    id="username"
+                                    type="text"
+                                    name="username"
+                                    value="{{ old('username') }}"
+                                    placeholder="Enter username"
                                     class="mt-2 block w-full rounded-xl border-slate-300 px-5 py-4 text-lg shadow-sm focus:border-amber-500 focus:ring-amber-500"
                                     required
                                     autofocus
                                 >
 
-                                @error('email')
+                                @error('username')
                                 <p class="mt-2 text-base font-semibold text-red-600">
                                     {{ $message }}
                                 </p>

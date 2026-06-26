@@ -16,30 +16,32 @@ class ProLoginController extends Controller
     public function store(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'username' => ['required'],
             'password' => ['required'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (
+            $credentials['username'] !== 'admin'
+            || $credentials['password'] !== 'admin'
+        ) {
             return back()
                 ->withErrors([
-                    'email' => 'Invalid login credentials.',
+                    'username' => 'Invalid username or password.',
                 ])
-                ->onlyInput('email');
+                ->onlyInput('username');
         }
 
-        $request->session()->regenerate();
+        session([
+            'pro_logged_in' => true,
+        ]);
 
         return redirect()->route('pro.index');
     }
 
     public function destroy(Request $request)
     {
-        Auth::logout();
+        $request->session()->forget('pro_logged_in');
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('login');
+        return redirect()->route('pro.login');
     }
 }

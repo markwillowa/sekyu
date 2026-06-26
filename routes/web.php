@@ -60,19 +60,15 @@ Route::prefix('guard')
 Route::prefix('pro')
     ->name('pro.')
     ->group(function () {
-        Route::middleware('guest')->group(function () {
-            Route::get('/login', [ProLoginController::class, 'create'])
-                ->name('login');
+        Route::get('/login', [ProLoginController::class, 'create'])
+            ->name('login');
 
-            Route::post('/login', [ProLoginController::class, 'store'])
-                ->name('login.store');
-        });
+        Route::post('/login', [ProLoginController::class, 'store'])
+            ->name('login.store');
 
-        Route::middleware('auth')->group(function () {
-            Route::get('/', [ProController::class, 'index'])
-                ->name('index');
+        Route::get('/', [ProController::class, 'index'])
+            ->name('index');
 
-            Route::post('/logout', [ProLoginController::class, 'destroy'])
-                ->name('logout');
-        });
+        Route::post('/logout', [ProLoginController::class, 'destroy'])
+            ->name('logout');
     });
