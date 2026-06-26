@@ -2,9 +2,9 @@
     x-data="{ mobileMenuOpen: false }"
     class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur"
 >
-    <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-6">
         {{-- Logo --}}
-        <div class="flex items-center gap-12">
+        <div class="flex items-center gap-8 xl:gap-12">
             <a href="{{ route('home') }}" class="flex items-center gap-3">
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-lg font-bold text-white">
                     S
@@ -14,6 +14,7 @@
                     <div class="text-xl font-bold tracking-wide text-slate-900">
                         SEKYU
                     </div>
+
                     <div class="-mt-1 text-xs uppercase tracking-widest text-slate-500">
                         Security Careers
                     </div>
@@ -31,6 +32,14 @@
 
         {{-- Desktop Right Side --}}
         <div class="hidden items-center gap-3 lg:flex">
+            <a
+                href="{{ route('pro.login') }}"
+                class="rounded-full bg-slate-900 px-4 py-2 text-xs font-black uppercase tracking-wide text-amber-400 transition hover:bg-slate-800"
+                title="SEKYU PRO"
+            >
+                PRO
+            </a>
+
             @guest
                 <a href="{{ route('guard.login') }}" class="rounded-lg px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-100">
                     Login
@@ -60,6 +69,7 @@
                             <div class="text-sm font-semibold text-slate-900">
                                 {{ auth()->user()->name }}
                             </div>
+
                             <div class="text-xs text-slate-500">
                                 Guard
                             </div>
@@ -83,6 +93,7 @@
 
                         <form method="POST" action="{{ route('guard.logout') }}">
                             @csrf
+
                             <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50">
                                 Logout
                             </button>
@@ -92,36 +103,46 @@
             @endauth
         </div>
 
-        {{-- Mobile Menu Button --}}
-        <button
-            type="button"
-            x-on:click="mobileMenuOpen = ! mobileMenuOpen"
-            class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 lg:hidden"
-            aria-label="Toggle mobile menu"
-        >
-            <svg
-                x-show="! mobileMenuOpen"
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        {{-- Mobile Right Side --}}
+        <div class="flex items-center gap-2 lg:hidden">
+            <a
+                href="{{ route('pro.login') }}"
+                class="rounded-full bg-slate-900 px-3 py-2 text-xs font-black uppercase tracking-wide text-amber-400 transition hover:bg-slate-800"
+                title="SEKYU PRO"
             >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+                PRO
+            </a>
 
-            <svg
-                x-show="mobileMenuOpen"
-                x-cloak
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            <button
+                type="button"
+                x-on:click="mobileMenuOpen = ! mobileMenuOpen"
+                class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200"
+                aria-label="Toggle mobile menu"
             >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
-            </svg>
-        </button>
+                <svg
+                    x-show="! mobileMenuOpen"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+
+                <svg
+                    x-show="mobileMenuOpen"
+                    x-cloak
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
     </div>
 
     {{-- Mobile Menu --}}
@@ -131,7 +152,11 @@
         x-transition
         class="border-t border-slate-200 bg-white lg:hidden"
     >
-        <div class="mx-auto max-w-7xl space-y-1 px-6 py-4">
+        <div class="mx-auto max-w-7xl space-y-1 px-4 py-4 sm:px-6">
+            <a href="{{ route('pro.login') }}" class="mb-3 block rounded-xl bg-slate-900 px-4 py-3 text-center font-black uppercase tracking-wide text-amber-400">
+                SEKYU PRO
+            </a>
+
             <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
                 Jobs
             </a>
