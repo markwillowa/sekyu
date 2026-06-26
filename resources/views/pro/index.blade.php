@@ -1,25 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-slate-100 px-4 py-6 sm:py-8">
+    <div class="min-h-screen bg-slate-100 px-3 py-3 sm:px-4 sm:py-8">
         <div class="mx-auto max-w-3xl">
-            <div class="mb-5 rounded-3xl bg-slate-900 p-5 text-center text-white shadow-lg sm:p-6">
-                <p class="text-sm font-bold uppercase tracking-[0.25em] text-amber-400">
+            <div class="mb-3 rounded-2xl bg-slate-900 p-4 text-center text-white shadow-lg sm:mb-5 sm:rounded-3xl sm:p-6">
+                <p class="text-xs font-bold uppercase tracking-[0.2em] text-amber-400 sm:text-sm sm:tracking-[0.25em]">
                     SEKYU PRO
                 </p>
 
-                <h1 class="mt-2 text-3xl font-extrabold tracking-tight">
+                <h1 class="mt-1 text-2xl font-extrabold tracking-tight sm:mt-2 sm:text-3xl">
                     Guard Time-In
                 </h1>
 
-                <p class="mt-1 text-base text-slate-300">
+                <p class="mt-1 text-sm text-slate-300 sm:text-base">
                     Face verification before going on duty.
                 </p>
             </div>
 
-            <div class="rounded-3xl bg-white p-5 shadow-xl sm:p-8">
+            <div class="rounded-2xl bg-white p-4 shadow-xl sm:rounded-3xl sm:p-8">
                 <div class="mx-auto max-w-xl">
-                    <div class="relative mx-auto aspect-square overflow-hidden rounded-full border-8 border-slate-200 bg-black shadow-inner">
+                    <div class="relative mx-auto aspect-square w-[280px] max-w-full overflow-hidden rounded-full border-4 border-slate-200 bg-black shadow-inner sm:w-full sm:max-w-md sm:border-8">
                         <video
                             id="camera"
                             class="h-full w-full object-cover"
@@ -33,36 +33,36 @@
                             class="absolute inset-0 h-full w-full"
                         ></canvas>
 
-                        <div class="pointer-events-none absolute inset-6 rounded-full border-4 border-dashed border-amber-400/80"></div>
+                        <div class="pointer-events-none absolute inset-4 rounded-full border-2 border-dashed border-amber-400/80 sm:inset-6 sm:border-4"></div>
                     </div>
 
-                    <p class="mt-4 text-center text-sm font-semibold text-slate-500">
+                    <p class="mt-3 text-center text-xs font-semibold text-slate-500 sm:mt-4 sm:text-sm">
                         Keep your face inside the circle.
                     </p>
 
-                    <div class="mt-5 rounded-3xl bg-amber-50 p-5 text-center">
+                    <div class="mt-3 rounded-2xl bg-amber-50 p-4 text-center sm:mt-5 sm:rounded-3xl sm:p-5">
                         <p
                             id="step-label"
-                            class="text-sm font-bold uppercase tracking-wider text-amber-700"
+                            class="text-xs font-bold uppercase tracking-wider text-amber-700 sm:text-sm"
                         >
                             Step 1 of 5
                         </p>
 
                         <h2
                             id="instruction"
-                            class="mt-3 text-4xl font-black leading-tight text-slate-900 sm:text-5xl"
+                            class="mt-2 text-2xl font-black leading-tight text-slate-900 sm:mt-3 sm:text-5xl"
                         >
                             LOADING CAMERA
                         </h2>
 
                         <p
                             id="step-description"
-                            class="mt-3 text-lg font-semibold leading-8 text-slate-600"
+                            class="mt-2 text-sm font-semibold leading-6 text-slate-600 sm:mt-3 sm:text-lg sm:leading-8"
                         >
                             Please wait while the system prepares your camera.
                         </p>
 
-                        <div class="mt-5 h-3 overflow-hidden rounded-full bg-slate-200">
+                        <div class="mt-4 h-2 overflow-hidden rounded-full bg-slate-200 sm:mt-5 sm:h-3">
                             <div
                                 id="progress-bar"
                                 class="h-full rounded-full bg-amber-500 transition-all duration-300"
@@ -72,7 +72,7 @@
 
                         <p
                             id="progress-text"
-                            class="mt-2 text-sm font-bold text-slate-500"
+                            class="mt-2 text-xs font-bold text-slate-500 sm:text-sm"
                         >
                             0%
                         </p>
@@ -80,23 +80,23 @@
 
                     <div
                         id="success"
-                        class="mt-5 hidden rounded-3xl border border-emerald-200 bg-emerald-50 p-6 text-center"
+                        class="mt-4 hidden rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center sm:mt-5 sm:rounded-3xl sm:p-6"
                     >
-                        <h3 class="text-3xl font-black text-emerald-700">
+                        <h3 class="text-2xl font-black text-emerald-700 sm:text-3xl">
                             TIME-IN SUCCESSFUL
                         </h3>
 
-                        <p id="success-message" class="mt-3 text-base font-semibold text-emerald-700">
+                        <p id="success-message" class="mt-2 text-sm font-semibold text-emerald-700 sm:mt-3 sm:text-base">
                             Guard attendance has been verified.
                         </p>
 
-                        <p class="mt-5 text-sm font-semibold text-emerald-700">
+                        <p class="mt-4 text-xs font-semibold text-emerald-700 sm:mt-5 sm:text-sm">
                             Returning to login in
                         </p>
 
                         <div
                             id="countdown"
-                            class="mt-3 text-8xl font-black tracking-tight text-emerald-700"
+                            class="mt-2 text-6xl font-black tracking-tight text-emerald-700 sm:mt-3 sm:text-8xl"
                         >
                             5
                         </div>
@@ -111,12 +111,12 @@
                         @csrf
                     </form>
 
-                    <form method="POST" action="{{ route('pro.logout') }}" class="mt-6">
+                    <form method="POST" action="{{ route('pro.logout') }}" class="mt-4 sm:mt-6">
                         @csrf
 
                         <button
                             type="submit"
-                            class="w-full rounded-xl border border-slate-300 px-5 py-4 text-lg font-bold text-slate-700 transition hover:bg-slate-50"
+                            class="w-full rounded-xl border border-slate-300 px-5 py-3 text-base font-bold text-slate-700 transition hover:bg-slate-50 sm:py-4 sm:text-lg"
                         >
                             Logout
                         </button>
