@@ -51,7 +51,7 @@
                     >
                         <x-slot:icon>
                             <x-framework.icon
-                                name="document"
+                                name="document-text"
                                 class="h-6 w-6"
                             />
                         </x-slot:icon>

@@ -23,7 +23,7 @@
 
             {{-- Desktop Navigation --}}
             <nav class="hidden items-center gap-8 lg:flex">
-                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">Jobs</a>
+                <a href="{{ route('jobs.index') }}" class="font-medium text-slate-700 transition hover:text-slate-900">Jobs</a>
                 <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">Agencies</a>
                 <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">Guard Directory</a>
                 <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">Resources</a>
@@ -49,7 +49,7 @@
                     Register Agency
                 </a>
 
-                <a href="#" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
+                <a href="{{ route('jobs.index') }}" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
                     Find Jobs
                 </a>
             @endguest
@@ -190,7 +190,7 @@
                 SEKYU PRO
             </a>
 
-            <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+            <a href="{{ route('jobs.index') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
                 Jobs
             </a>
 
@@ -217,7 +217,7 @@
                     Register Agency
                 </a>
 
-                <a href="#" class="mt-3 block rounded-lg bg-amber-500 px-4 py-3 text-center font-semibold text-white hover:bg-amber-600">
+                <a href="{{ route('jobs.index') }}" class="mt-3 block rounded-lg bg-amber-500 px-4 py-3 text-center font-semibold text-white hover:bg-amber-600">
                     Find Jobs
                 </a>
             @endguest

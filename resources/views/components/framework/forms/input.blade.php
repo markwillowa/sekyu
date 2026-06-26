@@ -1,16 +1,18 @@
 @props([
-    'label',
+    'label' => null,
     'name',
     'type' => 'text',
 ])
 
 <div>
-    <label
-        for="{{ $name }}"
-        class="mb-2 block text-sm font-semibold text-slate-700"
-    >
-        {{ $label }}
-    </label>
+    @if($label)
+        <label
+            for="{{ $name }}"
+            class="mb-2 block text-sm font-semibold text-slate-700"
+        >
+            {{ $label }}
+        </label>
+    @endif
 
     <input
         id="{{ $name }}"

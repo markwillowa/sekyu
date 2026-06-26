@@ -1,12 +1,14 @@
 @props([
-    'label',
+    'label' => null,
     'name',
 ])
 
 <label class="flex items-center justify-between">
-    <span class="text-sm font-semibold text-slate-700">
-        {{ $label }}
-    </span>
+    @if($label)
+        <span class="text-sm font-semibold text-slate-700">
+            {{ $label }}
+        </span>
+    @endif
 
     <input
         type="checkbox"

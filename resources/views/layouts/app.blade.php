@@ -8,7 +8,7 @@
         content="width=device-width, initial-scale=1"
     >
 
-    <title>{{ $title ?? 'Sekyu' }}</title>
+    <title>{{ (isset($title) && $title) ? $title . ' | Sekyu' : 'Sekyu - Security Job Portal' }}</title>
 
     @livewireStyles
 

@@ -1,5 +1,5 @@
 @props([
-    'label',
+    'label' => null,
     'name',
 ])
 
@@ -13,9 +13,11 @@
         ]) }}
     >
 
-    <span class="text-sm font-medium text-slate-700">
-        {{ $label }}
-    </span>
+    @if($label)
+        <span class="text-sm font-medium text-slate-700">
+            {{ $label }}
+        </span>
+    @endif
 </label>
 
 <x-framework.forms.error

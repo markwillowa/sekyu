@@ -1,5 +1,5 @@
-<section class="relative overflow-hidden bg-slate-50 mt-4">
-    <div class="mx-auto max-w-7xl px-6 py-24 lg:py-32">
+<section class="relative overflow-hidden bg-slate-50">
+    <div class="mx-auto max-w-7xl px-6 py-20 lg:py-28">
 
         <div class="mx-auto max-w-5xl text-center">
 
@@ -12,19 +12,15 @@
             <h1
                 class="text-5xl font-bold leading-tight text-slate-900 lg:text-6xl"
             >
-                Find Security Jobs With
-                Trusted Agencies
+                Find Your Next Security Role
             </h1>
 
             <p
                 class="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-600"
             >
-                Connect with verified security agencies across
-                the Philippines and discover opportunities that
-                match your skills and experience.
+                Browse through active job postings from verified security agencies across the Philippines and discover opportunities that match your skills.
             </p>
 
-            {{-- Search Card --}}
             {{-- Search Area --}}
             <div class="mx-auto mt-12 max-w-5xl">
 
@@ -42,6 +38,7 @@
                             <input
                                 type="text"
                                 name="q"
+                                value="{{ request('q') }}"
                                 placeholder="Search security jobs"
                                 class="w-full rounded-xl border-0 px-5 py-4 focus:ring-0"
                             >
@@ -59,6 +56,7 @@
                             <input
                                 type="text"
                                 name="location"
+                                value="{{ request('location') }}"
                                 placeholder="Location"
                                 class="w-full rounded-xl border-0 px-5 py-4 focus:ring-0"
                             >

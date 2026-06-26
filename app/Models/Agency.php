@@ -36,6 +36,18 @@ class Agency extends Model implements HasMedia
         return $this->hasMany(JobPost::class);
     }
 
+    public function activeJobPosts(): HasMany
+    {
+        return $this->hasMany(JobPost::class)->whereHas('status', function ($query) {
+            $query->whereIn('code', ['published', 'active']);
+        });
+    }
+
+    public function getActiveJobsCountAttribute(): int
+    {
+        return $this->activeJobPosts()->count();
+    }
+
     public function registerMediaCollections(): void
     {
         $this
