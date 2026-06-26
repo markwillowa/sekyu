@@ -7,7 +7,7 @@
             <div>
 
                 <span
-                    class="inline-flex rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-700"
+                    class="inline-flex rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-700 uppercase tracking-wider"
                 >
                     Featured Opportunities
                 </span>
@@ -37,52 +37,39 @@
         </div>
 
         {{-- Jobs Grid --}}
-        <div class="grid gap-6 lg:grid-cols-2">
+        <x-framework.layout.grid cols="2">
 
-            @foreach (range(1, 6) as $job)
-
-                <article
-                    class="group rounded-3xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl"
+            @forelse ($jobs as $job)
+                <x-framework.layout.card
+                    class="group transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl"
                 >
-
                     {{-- Header --}}
                     <div class="flex items-start justify-between">
-
                         <div class="flex gap-4">
-
                             {{-- Agency Logo --}}
                             <div
-                                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-lg font-bold text-slate-700"
+                                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-lg font-bold text-slate-700 uppercase"
                             >
-                                AS
+                                {{ substr($job->agency->name, 0, 2) }}
                             </div>
 
                             <div>
-
                                 <div class="flex items-center gap-2">
-
-                                    <h3
-                                        class="font-semibold text-slate-900"
-                                    >
-                                        ABC Security Agency
+                                    <h3 class="font-semibold text-slate-900">
+                                        {{ $job->agency->name }}
                                     </h3>
 
-                                    <span
-                                        class="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700"
-                                    >
-                                        Verified
-                                    </span>
-
+                                    @if($job->agency->verified_at)
+                                        <span class="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700 uppercase tracking-wider">
+                                            Verified
+                                        </span>
+                                    @endif
                                 </div>
 
-                                <p
-                                    class="mt-1 text-sm text-slate-500"
-                                >
-                                    Metro Manila
+                                <p class="mt-1 text-sm text-slate-500">
+                                    {{ $job->city }}, {{ $job->province }}
                                 </p>
-
                             </div>
-
                         </div>
 
                         {{-- Save Job --}}
@@ -90,73 +77,62 @@
                             type="button"
                             class="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
                         >
-                            ☆
+                            <x-framework.icon name="star" class="h-6 w-6" />
                         </button>
-
                     </div>
 
                     {{-- Job Title --}}
-                    <h2
-                        class="mt-6 text-2xl font-bold text-slate-900 transition group-hover:text-amber-600"
-                    >
-                        Security Guard - Makati
+                    <h2 class="mt-6 text-2xl font-bold text-slate-900 transition group-hover:text-amber-600">
+                        {{ $job->title }}
                     </h2>
 
                     {{-- Description --}}
-                    <p
-                        class="mt-3 line-clamp-2 text-slate-600"
-                    >
-                        We are looking for professional and licensed
-                        security guards to join our growing team and
-                        provide security services for commercial clients.
-                    </p>
+                    <div class="mt-3 line-clamp-2 text-slate-600 prose prose-sm max-w-none">
+                        {!! $job->description !!}
+                    </div>
 
                     {{-- Tags --}}
-                    <div
-                        class="mt-5 flex flex-wrap gap-2"
-                    >
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        @if($job->employmentType)
+                            <span class="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700">
+                                {{ $job->employmentType->name }}
+                            </span>
+                        @endif
 
-                        <span
-                            class="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700"
-                        >
-                            Full-Time
+                        @if($job->workLocationType)
+                            <span class="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700">
+                                {{ $job->workLocationType->name }}
+                            </span>
+                        @endif
+
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700">
+                            {{ $job->city }}
                         </span>
-
-                        <span
-                            class="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700"
-                        >
-                            Day Shift
-                        </span>
-
-                        <span
-                            class="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700"
-                        >
-                            Makati City
-                        </span>
-
                     </div>
 
                     {{-- Salary --}}
-                    <div
-                        class="mt-5 text-lg font-semibold text-slate-900"
-                    >
-                        ₱18,000 – ₱22,000 / month
+                    <div class="mt-5 text-lg font-semibold text-slate-900">
+                        @if($job->salary_min && $job->salary_max)
+                            ₱{{ number_format($job->salary_min) }} – ₱{{ number_format($job->salary_max) }}
+                            @if($job->salaryType)
+                                / {{ strtolower($job->salaryType->name) }}
+                            @endif
+                        @else
+                            Salary Negotiable
+                        @endif
                     </div>
 
                     {{-- Footer --}}
-                    <div
-                        class="mt-6 flex items-center justify-between border-t border-slate-100 pt-5"
-                    >
-
-                        <div
-                            class="flex items-center gap-4 text-sm text-slate-500"
-                        >
-                            <span>
-                                Posted 2 days ago
+                    <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
+                        <div class="flex items-center gap-4 text-sm text-slate-500">
+                            <span class="flex items-center gap-1">
+                                <x-framework.icon name="clock" class="h-4 w-4" />
+                                {{ $job->published_at ? $job->published_at->diffForHumans() : 'Recently' }}
                             </span>
 
-                            <span>
-                                25 Applicants
+                            <span class="flex items-center gap-1">
+                                <x-framework.icon name="users" class="h-4 w-4" />
+                                {{ $job->vacancies }} Vacancies
                             </span>
                         </div>
 
@@ -166,25 +142,25 @@
                         >
                             View Job →
                         </a>
-
                     </div>
+                </x-framework.layout.card>
 
-                </article>
+            @empty
+                <div class="col-span-full py-12 text-center">
+                    <p class="text-slate-500">No job opportunities available at the moment.</p>
+                </div>
+            @endforelse
 
-            @endforeach
-
-        </div>
+        </x-framework.layout.grid>
 
         {{-- Mobile CTA --}}
         <div class="mt-10 text-center md:hidden">
-
             <a
                 href="#"
                 class="inline-flex rounded-xl border border-slate-300 px-5 py-3 font-medium text-slate-700 transition hover:bg-slate-100"
             >
                 View All Jobs
             </a>
-
         </div>
 
     </div>

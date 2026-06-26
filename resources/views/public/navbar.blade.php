@@ -45,7 +45,7 @@
                     Login
                 </a>
 
-                <a href="#" class="rounded-lg border border-slate-300 px-5 py-2 font-medium text-slate-700 transition hover:bg-slate-50">
+                <a href="{{ route('agency.register') }}" class="rounded-lg border border-slate-300 px-5 py-2 font-medium text-slate-700 transition hover:bg-slate-50">
                     Register Agency
                 </a>
 
@@ -55,9 +55,15 @@
             @endguest
 
             @auth
-                <a href="#" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
-                    Find Jobs
-                </a>
+                @if(auth()->user()->hasRole('agency'))
+                    <a href="{{ route('agency.dashboard') }}" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
+                        Dashboard
+                    </a>
+                @else
+                    <a href="#" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
+                        Find Jobs
+                    </a>
+                @endif
 
                 <details class="relative">
                     <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-slate-100">
@@ -71,27 +77,54 @@
                             </div>
 
                             <div class="text-xs text-slate-500">
-                                Guard
+                                @if(auth()->user()->hasRole('agency'))
+                                    Agency
+                                @elseif(auth()->user()->hasRole('admin'))
+                                    Administrator
+                                @else
+                                    Guard
+                                @endif
                             </div>
                         </div>
                     </summary>
 
-                    <div class="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white py-2 shadow-xl">
-                        <a href="{{ route('guard.profile.show') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
-                            My Profile
-                        </a>
+                    <div class="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white py-2 shadow-xl">
+                        @if(auth()->user()->hasRole('agency'))
+                            <a href="{{ route('agency.dashboard') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                Agency Dashboard
+                            </a>
 
-                        <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
-                            My Applications
-                        </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                Company Profile
+                            </a>
 
-                        <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
-                            My Documents
-                        </a>
+                            <a href="{{ route('agency.job-posts.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                Job Posts
+                            </a>
+
+                            <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                Applications
+                            </a>
+                        @else
+                            <a href="{{ route('guard.profile.show') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                My Profile
+                            </a>
+
+                            <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                My Applications
+                            </a>
+
+                            <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                My Documents
+                            </a>
+                        @endif
 
                         <hr class="my-2 border-slate-200">
 
-                        <form method="POST" action="{{ route('guard.logout') }}">
+                        <form
+                            method="POST"
+                            action="{{ auth()->user()->hasRole('agency') ? route('agency.logout') : route('guard.logout') }}"
+                        >
                             @csrf
 
                             <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50">
@@ -180,7 +213,7 @@
                     Login
                 </a>
 
-                <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                <a href="{{ route('agency.register') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
                     Register Agency
                 </a>
 
@@ -190,23 +223,45 @@
             @endguest
 
             @auth
-                <a href="{{ route('guard.profile.show') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
-                    My Profile
-                </a>
+                @if(auth()->user()->role === 'agency')
+                    <a href="{{ route('agency.dashboard') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                        Agency Dashboard
+                    </a>
 
-                <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
-                    My Applications
-                </a>
+                    <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                        Company Profile
+                    </a>
 
-                <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
-                    My Documents
-                </a>
+                    <a href="{{ route('agency.job-posts.index') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                        Job Posts
+                    </a>
 
-                <a href="#" class="mt-3 block rounded-lg bg-amber-500 px-4 py-3 text-center font-semibold text-white hover:bg-amber-600">
-                    Find Jobs
-                </a>
+                    <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                        Applications
+                    </a>
+                @else
+                    <a href="{{ route('guard.profile.show') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                        My Profile
+                    </a>
 
-                <form method="POST" action="{{ route('guard.logout') }}" class="mt-3">
+                    <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                        My Applications
+                    </a>
+
+                    <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                        My Documents
+                    </a>
+
+                    <a href="#" class="mt-3 block rounded-lg bg-amber-500 px-4 py-3 text-center font-semibold text-white hover:bg-amber-600">
+                        Find Jobs
+                    </a>
+                @endif
+
+                <form
+                    method="POST"
+                    action="{{ auth()->user()->hasRole('agency') ? route('agency.logout') : route('guard.logout') }}"
+                    class="mt-3"
+                >
                     @csrf
 
                     <button type="submit" class="block w-full rounded-lg px-4 py-3 text-left font-medium text-red-600 hover:bg-red-50">

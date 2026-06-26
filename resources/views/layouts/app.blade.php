@@ -10,10 +10,14 @@
 
     <title>{{ $title ?? 'Sekyu' }}</title>
 
+    @livewireStyles
+
     @vite([
         'resources/css/app.css',
         'resources/js/app.js',
     ])
+
+    @filamentStyles
 </head>
 
 <body class="bg-slate-50 text-slate-900">
@@ -25,6 +29,9 @@
 </main>
 
 @include('public.footer')
+
+@livewireScripts
+@filamentScripts
 
 </body>
 </html>

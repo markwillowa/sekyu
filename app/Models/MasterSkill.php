@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class MasterSkill extends Model
 {
     protected $fillable = [
+        'code',
         'name',
-        'category',
         'description',
+        'sort_order',
         'is_active',
     ];
 
     protected $casts = [
+        'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];
 

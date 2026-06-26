@@ -8,15 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class MasterLicenseType extends Model
 {
     protected $fillable = [
+        'code',
         'name',
         'description',
-        'requires_expiry',
+        'sort_order',
         'is_active',
+        'requires_expiry',
     ];
 
     protected $casts = [
-        'requires_expiry' => 'boolean',
+        'sort_order' => 'integer',
         'is_active' => 'boolean',
+        'requires_expiry' => 'boolean',
     ];
 
     public function guardLicenses(): HasMany

@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class MasterSkillLevel extends Model
 {
     protected $fillable = [
+        'code',
         'name',
+        'description',
         'sort_order',
         'is_active',
     ];
 
     protected $casts = [
+        'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];
 }

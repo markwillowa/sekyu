@@ -10,9 +10,9 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::updateOrCreate(
+        $admin = User::updateOrCreate(
             [
-                'email' => 'admin@admin',
+                'email' => 'admin@sekyu.com',
             ],
             [
                 'name' => 'System Administrator',
@@ -20,5 +20,30 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+        $admin->assignRole('admin');
+
+        $agency = User::updateOrCreate(
+            [
+                'email' => 'agency@sekyu.com',
+            ],
+            [
+                'name' => 'Agency User',
+                'password' => Hash::make('agency'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $agency->assignRole('agency');
+
+        $guard = User::updateOrCreate(
+            [
+                'email' => 'guard@sekyu.com',
+            ],
+            [
+                'name' => 'Security Guard',
+                'password' => Hash::make('guard'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $guard->assignRole('guard');
     }
 }

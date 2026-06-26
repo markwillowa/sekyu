@@ -79,15 +79,23 @@ class MasterDataSeeder extends Seeder
         $this->seedLicenseTypes();
 
         $this->seedClearanceTypes();
+        $this->seedWorkLocationTypes();
+        $this->seedSalaryTypes();
+        $this->seedJobStatuses();
     }
 
     private function seedSimple(string $table, array $names): void
     {
-        foreach ($names as $name) {
+        foreach ($names as $index => $name) {
+            $code = str($name)->slug('_');
+
             DB::table($table)->updateOrInsert(
-                ['name' => $name],
+                ['code' => $code],
                 [
+                    'code' => $code,
                     'name' => $name,
+                    'description' => null,
+                    'sort_order' => $index + 1,
                     'is_active' => true,
                     'updated_at' => now(),
                     'created_at' => now(),
@@ -98,18 +106,7 @@ class MasterDataSeeder extends Seeder
 
     private function seedSortable(string $table, array $names): void
     {
-        foreach ($names as $index => $name) {
-            DB::table($table)->updateOrInsert(
-                ['name' => $name],
-                [
-                    'name' => $name,
-                    'sort_order' => $index + 1,
-                    'is_active' => true,
-                    'updated_at' => now(),
-                    'created_at' => now(),
-                ],
-            );
-        }
+        $this->seedSimple($table, $names);
     }
 
     private function seedLanguages(): void
@@ -130,11 +127,14 @@ class MasterDataSeeder extends Seeder
             ['name' => 'Arabic', 'code' => 'ar'],
         ];
 
-        foreach ($languages as $language) {
+        foreach ($languages as $index => $language) {
             DB::table('master_languages')->updateOrInsert(
-                ['name' => $language['name']],
+                ['code' => $language['code']],
                 [
                     'code' => $language['code'],
+                    'name' => $language['name'],
+                    'description' => null,
+                    'sort_order' => $index + 1,
                     'is_active' => true,
                     'updated_at' => now(),
                     'created_at' => now(),
@@ -178,12 +178,16 @@ class MasterDataSeeder extends Seeder
             ['Investigation Support', 'Special Operations'],
         ];
 
-        foreach ($skills as [$name, $category]) {
+        foreach ($skills as $index => [$name, $category]) {
+            $code = str($name)->slug('_');
+
             DB::table('master_skills')->updateOrInsert(
-                ['name' => $name],
+                ['code' => $code],
                 [
-                    'category' => $category,
-                    'description' => null,
+                    'code' => $code,
+                    'name' => $name,
+                    'description' => "Category: $category",
+                    'sort_order' => $index + 1,
                     'is_active' => true,
                     'updated_at' => now(),
                     'created_at' => now(),
@@ -217,17 +221,7 @@ class MasterDataSeeder extends Seeder
             'Cash Escort',
         ];
 
-        foreach ($names as $name) {
-            DB::table('master_specializations')->updateOrInsert(
-                ['name' => $name],
-                [
-                    'description' => null,
-                    'is_active' => true,
-                    'updated_at' => now(),
-                    'created_at' => now(),
-                ],
-            );
-        }
+        $this->seedSimple('master_specializations', $names);
     }
 
     private function seedTrainingTypes(): void
@@ -249,12 +243,16 @@ class MasterDataSeeder extends Seeder
             ['CCTV Monitoring Training', 'Security Systems'],
         ];
 
-        foreach ($trainings as [$name, $category]) {
+        foreach ($trainings as $index => [$name, $category]) {
+            $code = str($name)->slug('_');
+
             DB::table('master_training_types')->updateOrInsert(
-                ['name' => $name],
+                ['code' => $code],
                 [
-                    'category' => $category,
-                    'description' => null,
+                    'code' => $code,
+                    'name' => $name,
+                    'description' => "Category: $category",
+                    'sort_order' => $index + 1,
                     'is_active' => true,
                     'updated_at' => now(),
                     'created_at' => now(),
@@ -274,12 +272,17 @@ class MasterDataSeeder extends Seeder
             ['Driver License', true],
         ];
 
-        foreach ($licenses as [$name, $requiresExpiry]) {
+        foreach ($licenses as $index => [$name, $requiresExpiry]) {
+            $code = str($name)->slug('_');
+
             DB::table('master_license_types')->updateOrInsert(
-                ['name' => $name],
+                ['code' => $code],
                 [
+                    'code' => $code,
+                    'name' => $name,
                     'description' => null,
                     'requires_expiry' => $requiresExpiry,
+                    'sort_order' => $index + 1,
                     'is_active' => true,
                     'updated_at' => now(),
                     'created_at' => now(),
@@ -300,17 +303,61 @@ class MasterDataSeeder extends Seeder
             ['Drug Test Clearance', true],
         ];
 
-        foreach ($clearances as [$name, $requiresExpiry]) {
+        foreach ($clearances as $index => [$name, $requiresExpiry]) {
+            $code = str($name)->slug('_');
+
             DB::table('master_clearance_types')->updateOrInsert(
-                ['name' => $name],
+                ['code' => $code],
                 [
+                    'code' => $code,
+                    'name' => $name,
                     'description' => null,
                     'requires_expiry' => $requiresExpiry,
+                    'sort_order' => $index + 1,
                     'is_active' => true,
                     'updated_at' => now(),
                     'created_at' => now(),
                 ],
             );
         }
+    }
+
+    private function seedWorkLocationTypes(): void
+    {
+        $names = [
+            'On-site',
+            'Remote',
+            'Hybrid',
+            'Field-based',
+        ];
+
+        $this->seedSimple('master_work_location_types', $names);
+    }
+
+    private function seedSalaryTypes(): void
+    {
+        $names = [
+            'Monthly',
+            'Semi-monthly',
+            'Weekly',
+            'Daily',
+            'Hourly',
+        ];
+
+        $this->seedSimple('master_salary_types', $names);
+    }
+
+    private function seedJobStatuses(): void
+    {
+        $names = [
+            'Active',
+            'Inactive',
+            'Draft',
+            'Cancelled',
+            'On Hold',
+            'Completed',
+        ];
+
+        $this->seedSimple('master_job_statuses', $names);
     }
 }
