@@ -1,7 +1,9 @@
 substitutions:
   _REGION: asia-southeast1
   _SERVICE_NAME: sekyu
+  _JOB_NAME: sekyu-migrate
   _REPOSITORY: sekyu-repo
+  _CLOUDSQL_INSTANCE: sekyu-500407:asia-southeast1:sekyu-db
 
 steps:
   - name: gcr.io/cloud-builders/docker
@@ -27,6 +29,30 @@ steps:
       - --platform=managed
       - --allow-unauthenticated
       - --port=8080
+      - --add-cloudsql-instances=${_CLOUDSQL_INSTANCE}
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - jobs
+      - deploy
+      - ${_JOB_NAME}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$SHORT_SHA
+      - --region=${_REGION}
+      - --set-cloudsql-instances=${_CLOUDSQL_INSTANCE}
+      - --command=php
+      - --args=artisan,migrate,--force
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - jobs
+      - execute
+      - ${_JOB_NAME}
+      - --region=${_REGION}
+      - --wait
 
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$SHORT_SHA
