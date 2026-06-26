@@ -49,7 +49,7 @@ class GuardProfile extends Model implements HasMedia
         return $this->belongsTo(User::class);
     }
 
-    public function contactDetail(): HasOne
+    public function contactDetails(): HasOne
     {
         return $this->hasOne(GuardContactDetail::class);
     }

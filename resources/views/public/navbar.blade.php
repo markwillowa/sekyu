@@ -1,19 +1,12 @@
 <header
+    x-data="{ mobileMenuOpen: false }"
     class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur"
 >
-    <div
-        class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6"
-    >
+    <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
         {{-- Logo --}}
         <div class="flex items-center gap-12">
-
-            <a
-                href="{{ route('home') }}"
-                class="flex items-center gap-3"
-            >
-                <div
-                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-lg font-bold text-white"
-                >
+            <a href="{{ route('home') }}" class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-lg font-bold text-white">
                     S
                 </div>
 
@@ -21,7 +14,6 @@
                     <div class="text-xl font-bold tracking-wide text-slate-900">
                         SEKYU
                     </div>
-
                     <div class="-mt-1 text-xs uppercase tracking-widest text-slate-500">
                         Security Careers
                     </div>
@@ -30,66 +22,37 @@
 
             {{-- Desktop Navigation --}}
             <nav class="hidden items-center gap-8 lg:flex">
-                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">
-                    Jobs
-                </a>
-
-                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">
-                    Agencies
-                </a>
-
-                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">
-                    Guard Directory
-                </a>
-
-                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">
-                    Resources
-                </a>
+                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">Jobs</a>
+                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">Agencies</a>
+                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">Guard Directory</a>
+                <a href="#" class="font-medium text-slate-700 transition hover:text-slate-900">Resources</a>
             </nav>
-
         </div>
 
-        {{-- Right Side --}}
+        {{-- Desktop Right Side --}}
         <div class="hidden items-center gap-3 lg:flex">
-
             @guest
-                <a
-                    href="{{ route('guard.login') }}"
-                    class="rounded-lg px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-100"
-                >
+                <a href="{{ route('guard.login') }}" class="rounded-lg px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-100">
                     Login
                 </a>
 
-                <a
-                    href="#"
-                    class="rounded-lg border border-slate-300 px-5 py-2 font-medium text-slate-700 transition hover:bg-slate-50"
-                >
+                <a href="#" class="rounded-lg border border-slate-300 px-5 py-2 font-medium text-slate-700 transition hover:bg-slate-50">
                     Register Agency
                 </a>
 
-                <a
-                    href="#"
-                    class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600"
-                >
+                <a href="#" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
                     Find Jobs
                 </a>
             @endguest
 
             @auth
-                <a
-                    href="#"
-                    class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600"
-                >
+                <a href="#" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
                     Find Jobs
                 </a>
 
                 <details class="relative">
-                    <summary
-                        class="flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-slate-100"
-                    >
-                        <div
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 font-semibold text-white"
-                        >
+                    <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-slate-100">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 font-semibold text-white">
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         </div>
 
@@ -97,92 +60,135 @@
                             <div class="text-sm font-semibold text-slate-900">
                                 {{ auth()->user()->name }}
                             </div>
-
                             <div class="text-xs text-slate-500">
                                 Guard
                             </div>
                         </div>
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 text-slate-500"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="m19 9-7 7-7-7"
-                            />
-                        </svg>
                     </summary>
 
-                    <div
-                        class="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white py-2 shadow-xl"
-                    >
-                        <a
-                            href="#"
-                            class="block px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
-                        >
+                    <div class="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white py-2 shadow-xl">
+                        <a href="{{ route('guard.profile.show') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                             My Profile
                         </a>
 
-                        <a
-                            href="#"
-                            class="block px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
-                        >
+                        <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                             My Applications
                         </a>
 
-                        <a
-                            href="#"
-                            class="block px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
-                        >
+                        <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                             My Documents
                         </a>
 
                         <hr class="my-2 border-slate-200">
 
-                        <form
-                            method="POST"
-                            action="{{ route('guard.logout') }}"
-                        >
+                        <form method="POST" action="{{ route('guard.logout') }}">
                             @csrf
-
-                            <button
-                                type="submit"
-                                class="block w-full px-4 py-2 text-left text-sm text-red-600 transition hover:bg-red-50"
-                            >
+                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50">
                                 Logout
                             </button>
                         </form>
                     </div>
                 </details>
             @endauth
-
         </div>
 
         {{-- Mobile Menu Button --}}
         <button
+            type="button"
+            x-on:click="mobileMenuOpen = ! mobileMenuOpen"
             class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 lg:hidden"
+            aria-label="Toggle mobile menu"
         >
             <svg
+                x-show="! mobileMenuOpen"
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
             >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+
+            <svg
+                x-show="mobileMenuOpen"
+                x-cloak
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
             </svg>
         </button>
+    </div>
 
+    {{-- Mobile Menu --}}
+    <div
+        x-show="mobileMenuOpen"
+        x-cloak
+        x-transition
+        class="border-t border-slate-200 bg-white lg:hidden"
+    >
+        <div class="mx-auto max-w-7xl space-y-1 px-6 py-4">
+            <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                Jobs
+            </a>
+
+            <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                Agencies
+            </a>
+
+            <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                Guard Directory
+            </a>
+
+            <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                Resources
+            </a>
+
+            <hr class="my-3 border-slate-200">
+
+            @guest
+                <a href="{{ route('guard.login') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                    Login
+                </a>
+
+                <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                    Register Agency
+                </a>
+
+                <a href="#" class="mt-3 block rounded-lg bg-amber-500 px-4 py-3 text-center font-semibold text-white hover:bg-amber-600">
+                    Find Jobs
+                </a>
+            @endguest
+
+            @auth
+                <a href="{{ route('guard.profile.show') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                    My Profile
+                </a>
+
+                <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                    My Applications
+                </a>
+
+                <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                    My Documents
+                </a>
+
+                <a href="#" class="mt-3 block rounded-lg bg-amber-500 px-4 py-3 text-center font-semibold text-white hover:bg-amber-600">
+                    Find Jobs
+                </a>
+
+                <form method="POST" action="{{ route('guard.logout') }}" class="mt-3">
+                    @csrf
+
+                    <button type="submit" class="block w-full rounded-lg px-4 py-3 text-left font-medium text-red-600 hover:bg-red-50">
+                        Logout
+                    </button>
+                </form>
+            @endauth
+        </div>
     </div>
 </header>

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('guard_educational_background', function (Blueprint $table) {
+        Schema::create('guard_educational_backgrounds', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('guard_profile_id')
@@ -41,6 +41,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('guard_educational_background');
+        Schema::dropIfExists('guard_educational_backgrounds');
     }
 };

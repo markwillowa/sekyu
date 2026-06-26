@@ -1,47 +1,45 @@
 <?php
 
-namespace App\Http\Controllers\Guard\Auth;
+namespace App\Http\Controllers\Pro;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
-class GuardLoginController extends Controller
+class ProLoginController extends Controller
 {
-    public function create(): View
+    public function create()
     {
-        return view('guard.auth.login');
+        return view('pro.auth.login');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
+            'password' => ['required'],
         ]);
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withErrors([
-                    'email' => 'Invalid email or password.',
+                    'email' => 'Invalid login credentials.',
                 ])
                 ->onlyInput('email');
         }
 
         $request->session()->regenerate();
 
-        return redirect()->route('guard.home');
+        return redirect()->route('pro.index');
     }
 
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('guard.login');
+        return redirect()->route('login');
     }
 }
