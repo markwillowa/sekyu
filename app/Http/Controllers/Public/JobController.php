@@ -57,12 +57,49 @@ class JobController extends Controller
                 break;
             case 'newest':
             default:
-                $query->latest('published_at');
+                $query->latest();
                 break;
         }
 
-        $jobs = $query->paginate(12)->withQueryString();
+        $jobs = $query->paginate(50)->withQueryString();
 
-        return view('public.jobs.index', compact('jobs'));
+        // Fetch 4 random jobs for the top section (prioritizing featured)
+        $featuredQuery = JobPost::query()
+            ->whereIn('job_status_id', $statusIds)
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->with([
+                'agency' => function($q) {
+                    $q->withCount(['jobPosts as active_jobs_count' => function($sq) {
+                        $sq->whereHas('status', function($ssq) {
+                            $ssq->whereIn('code', ['published', 'active']);
+                        });
+                    }]);
+                },
+                'employmentType',
+                'workLocationType',
+                'salaryType'
+            ]);
+
+        // If we are on a search results page or have active filters, we might want to pick from the filtered query instead.
+        // But the user said "4 random jobs are on top", implying a global feature or something.
+        // If I use the filtered query, it might be empty.
+        // Let's stick with global for now as "Featured" usually works that way.
+
+        $randomJobs = (clone $featuredQuery)->where('is_featured', true)->inRandomOrder()->take(4)->get();
+
+        if ($randomJobs->count() < 4) {
+            $excludeIds = $randomJobs->pluck('id')->toArray();
+            $additionalJobs = (clone $featuredQuery)
+                ->whereNotIn('id', $excludeIds)
+                ->inRandomOrder()
+                ->take(4 - $randomJobs->count())
+                ->get();
+            $randomJobs = $randomJobs->concat($additionalJobs);
+        }
+
+        return view('public.jobs.index', compact('jobs', 'randomJobs'));
     }
 }

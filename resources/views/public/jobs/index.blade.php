@@ -5,7 +5,7 @@
         mobileFiltersOpen: false,
         showDetailsPane: false,
         activeJob: null,
-        jobs: {{ $jobs->toJson() }},
+        jobs: {{ $jobs->getCollection()->concat($randomJobs)->unique('id')->toJson() }},
         openDetails(id) {
             this.activeJob = id;
             this.showDetailsPane = true;
@@ -35,7 +35,27 @@
 
                             {{-- Job List - Now Grid for better use of space if details are hidden --}}
                             <div class="grid grid-cols-1 gap-8">
+                                {{-- 4 Random Jobs on Top --}}
+                                @foreach($randomJobs as $job)
+                                    @if($job->is_featured)
+                                        @include('public.jobs.components.featured-card', ['job' => $job])
+                                    @else
+                                        @include('public.jobs.components.job-card', ['job' => $job])
+                                    @endif
+                                @endforeach
+
+                                {{-- Divider --}}
+                                <div class="relative py-4">
+                                    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                        <div class="w-full border-t border-slate-200"></div>
+                                    </div>
+                                    <div class="relative flex justify-center">
+                                        <span class="bg-slate-50 px-3 text-sm font-bold text-slate-500 uppercase tracking-widest">Featured & Recommended</span>
+                                    </div>
+                                </div>
+
                                 @forelse ($jobs as $job)
+                                    @continue($randomJobs->contains('id', $job->id))
                                     @if($job->is_featured)
                                         @include('public.jobs.components.featured-card', ['job' => $job])
                                     @else
@@ -124,7 +144,7 @@
 
                 {{-- Details Content --}}
                 <div class="flex-1 overflow-y-auto scroll-smooth">
-                    @foreach($jobs as $job)
+                    @foreach($jobs->getCollection()->concat($randomJobs)->unique('id') as $job)
                         <div x-show="activeJob === {{ $job->id }}" style="display: none;">
                             @include('public.jobs.components.details-pane', ['job' => $job])
                         </div>
