@@ -10,8 +10,12 @@
     </div>
 
     {{-- Save Button --}}
-    <button type="button" class="absolute right-6 top-6 z-10 text-slate-300 hover:text-red-500 transition-colors" @click.stop="">
-        <x-framework.icon name="heart" class="h-7 w-7" />
+    <button type="button"
+        class="absolute right-6 top-6 z-10 transition-colors"
+        :class="isSaved({{ $job->id }}) ? 'text-rose-500' : 'text-slate-300 hover:text-rose-500'"
+        @click.stop="toggleSave({{ $job->id }})">
+        <x-framework.icon name="heart" class="h-7 w-7" variant="s" x-show="isSaved({{ $job->id }})" />
+        <x-framework.icon name="heart" class="h-7 w-7" variant="o" x-show="!isSaved({{ $job->id }})" />
     </button>
 
     <div class="flex flex-col md:flex-row gap-4 md:gap-6">
@@ -43,7 +47,7 @@
             <div class="mt-4 flex flex-wrap gap-4 items-center">
                 <span class="flex items-center gap-1.5 text-slate-500 text-sm font-medium">
                     <x-framework.icon name="map-pin" class="h-4.5 w-4.5 text-amber-400" />
-                    {{ $job->city }}
+                    {{ $job->location?->name ?? $job->city }}
                 </span>
                 <span class="flex items-center gap-1.5 text-slate-500 text-sm font-medium">
                     <x-framework.icon name="briefcase" class="h-4.5 w-4.5 text-amber-400" />

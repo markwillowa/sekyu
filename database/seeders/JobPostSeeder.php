@@ -16,10 +16,13 @@ class JobPostSeeder extends Seeder
         $agencies = Agency::all();
 
         foreach ($agencies as $agency) {
+            $template = $agency->workflowTemplates()->first();
+
             JobPost::factory()
-                ->count(10)
+                ->count(5)
                 ->create([
                     'agency_id' => $agency->id,
+                    'workflow_template_id' => $template?->id,
                 ]);
         }
     }

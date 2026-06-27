@@ -1,4 +1,4 @@
-<section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+<x-framework.layout.card>
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
             <h2 class="text-xl font-bold text-slate-900">
@@ -10,10 +10,72 @@
             </p>
         </div>
 
-        <a href="#" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+        <x-framework.buttons.primary
+            href="#"
+            size="sm"
+            @click.prevent="$dispatch('open-modal', 'add-license')"
+        >
             Add License
-        </a>
+        </x-framework.buttons.primary>
     </div>
+
+    <x-framework.feedback.modal
+        name="add-license"
+        title="Add License"
+        description="Add a security license or professional permit."
+    >
+        <form action="{{ route('applicant.profile.store-license') }}" method="POST" class="space-y-6">
+            @csrf
+
+            <div class="grid gap-6 sm:grid-cols-2">
+                <x-framework.forms.select
+                    label="License Type"
+                    name="master_license_type_id"
+                    :options="$licenseTypes->pluck('name', 'id')"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="License Number"
+                    name="license_number"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="Issue Date"
+                    name="issued_at"
+                    type="date"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="Expiry Date"
+                    name="expires_at"
+                    type="date"
+                />
+
+                <div class="sm:col-span-2">
+                    <x-framework.forms.input
+                        label="Issuing Authority"
+                        name="issuing_authority"
+                    />
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-8">
+                <x-framework.buttons.secondary
+                    type="button"
+                    @click="$dispatch('close-modal', 'add-license')"
+                >
+                    Cancel
+                </x-framework.buttons.secondary>
+
+                <x-framework.buttons.primary type="submit">
+                    Add License
+                </x-framework.buttons.primary>
+            </div>
+        </form>
+    </x-framework.feedback.modal>
 
     @if ($licenses->isEmpty())
         <div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
@@ -49,17 +111,89 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <a href="#" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                            <x-framework.buttons.secondary
+                                href="#"
+                                size="sm"
+                                @click.prevent="$dispatch('open-modal', 'edit-license-{{ $license->id }}')"
+                            >
                                 Edit
-                            </a>
+                            </x-framework.buttons.secondary>
 
-                            <a href="#" class="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
-                                Delete
-                            </a>
+                            <x-framework.feedback.modal
+                                name="edit-license-{{ $license->id }}"
+                                title="Edit License"
+                                description="Update your license information."
+                            >
+                                <form action="{{ route('applicant.profile.update-license', $license) }}" method="POST" class="space-y-6">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    <div class="grid gap-6 sm:grid-cols-2">
+                                        <x-framework.forms.select
+                                            label="License Type"
+                                            name="master_license_type_id"
+                                            :options="$licenseTypes->pluck('name', 'id')"
+                                            :selected="$license->master_license_type_id"
+                                            required
+                                        />
+
+                                        <x-framework.forms.input
+                                            label="License Number"
+                                            name="license_number"
+                                            :value="$license->license_number"
+                                            required
+                                        />
+
+                                        <x-framework.forms.input
+                                            label="Issue Date"
+                                            name="issued_at"
+                                            type="date"
+                                            :value="$license->issued_at?->format('Y-m-d')"
+                                            required
+                                        />
+
+                                        <x-framework.forms.input
+                                            label="Expiry Date"
+                                            name="expires_at"
+                                            type="date"
+                                            :value="$license->expires_at?->format('Y-m-d')"
+                                        />
+
+                                        <div class="sm:col-span-2">
+                                            <x-framework.forms.input
+                                                label="Issuing Authority"
+                                                name="issuing_authority"
+                                                :value="$license->issuing_authority"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end gap-3 mt-8">
+                                        <x-framework.buttons.secondary
+                                            type="button"
+                                            @click="$dispatch('close-modal', 'edit-license-{{ $license->id }}')"
+                                        >
+                                            Cancel
+                                        </x-framework.buttons.secondary>
+
+                                        <x-framework.buttons.primary type="submit">
+                                            Save Changes
+                                        </x-framework.buttons.primary>
+                                    </div>
+                                </form>
+                            </x-framework.feedback.modal>
+
+                            <form action="{{ route('applicant.profile.delete-license', $license) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this license?')">
+                                @csrf
+                                @method('DELETE')
+                                <x-framework.buttons.secondary type="submit" size="sm" class="text-red-600 border-red-200 hover:bg-red-50">
+                                    Delete
+                                </x-framework.buttons.secondary>
+                            </form>
                         </div>
                     </div>
                 </article>
             @endforeach
         </div>
     @endif
-</section>
+</x-framework.layout.card>

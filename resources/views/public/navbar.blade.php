@@ -40,10 +40,51 @@
                 PRO
             </a>
 
+            @auth
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="relative rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus:outline-none">
+                        <x-framework.icon name="bell" class="h-6 w-6" />
+                        @if(auth()->user()->unreadNotifications->count() > 0)
+                            <span class="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white"></span>
+                        @endif
+                    </button>
+
+                    <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-80 rounded-2xl border border-slate-200 bg-white py-2 shadow-2xl z-50 overflow-hidden" style="display: none;">
+                        <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center">
+                            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Notifications</span>
+                            @if(auth()->user()->unreadNotifications->count() > 0)
+                                <a href="#" class="text-[10px] font-bold text-blue-600 uppercase hover:underline">Mark all read</a>
+                            @endif
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            @forelse(auth()->user()->notifications->take(5) as $notification)
+                                <div class="px-4 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-0 transition-colors">
+                                    <p class="text-sm text-slate-900 font-medium leading-snug">
+                                        {{ $notification->data['message'] ?? 'Notification received' }}
+                                    </p>
+                                    <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-wider">{{ $notification->created_at->diffForHumans() }}</p>
+                                </div>
+                            @empty
+                                <div class="px-4 py-8 text-center">
+                                    <x-framework.icon name="bell-slash" class="h-10 w-10 text-slate-200 mx-auto mb-2" />
+                                    <p class="text-sm text-slate-400">No notifications yet</p>
+                                </div>
+                            @endforelse
+                        </div>
+                        <a href="#" class="block px-4 py-2 text-center text-xs font-bold text-slate-500 bg-slate-50 hover:bg-slate-100">
+                            View all notifications
+                        </a>
+                    </div>
+                </div>
+            @endauth
+
             @guest
-                <a href="{{ route('guard.login') }}" class="rounded-lg px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-100">
+                <button
+                    @click="$dispatch('open-modal', 'login-modal')"
+                    class="rounded-lg px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-100"
+                >
                     Login
-                </a>
+                </button>
 
                 <a href="{{ route('agency.register') }}" class="rounded-lg border border-slate-300 px-5 py-2 font-medium text-slate-700 transition hover:bg-slate-50">
                     Register Agency
@@ -60,8 +101,8 @@
                         Dashboard
                     </a>
                 @else
-                    <a href="#" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
-                        Find Jobs
+                    <a href="{{ route('applicant.dashboard') }}" class="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-white transition hover:bg-amber-600">
+                        Dashboard
                     </a>
                 @endif
 
@@ -102,15 +143,23 @@
                                 Job Posts
                             </a>
 
-                            <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                            <a href="{{ route('agency.workflow-templates.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                Workflow Templates
+                            </a>
+
+                            <a href="{{ route('agency.applications.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                                 Applications
                             </a>
                         @else
-                            <a href="{{ route('guard.profile.show') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                            <a href="{{ route('applicant.dashboard') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                Dashboard
+                            </a>
+
+                            <a href="{{ route('applicant.profile.show') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                                 My Profile
                             </a>
 
-                            <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                            <a href="{{ route('applicant.applications.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                                 My Applications
                             </a>
 
@@ -123,7 +172,7 @@
 
                         <form
                             method="POST"
-                            action="{{ auth()->user()->hasRole('agency') ? route('agency.logout') : route('guard.logout') }}"
+                            action="{{ auth()->user()->hasRole('agency') ? route('agency.logout') : route('applicant.logout') }}"
                         >
                             @csrf
 
@@ -209,9 +258,12 @@
             <hr class="my-3 border-slate-200">
 
             @guest
-                <a href="{{ route('guard.login') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                <button
+                    @click="$dispatch('open-modal', 'login-modal')"
+                    class="block w-full rounded-lg px-4 py-3 text-left font-medium text-slate-700 hover:bg-slate-100"
+                >
                     Login
-                </a>
+                </button>
 
                 <a href="{{ route('agency.register') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
                     Register Agency
@@ -236,15 +288,19 @@
                         Job Posts
                     </a>
 
-                    <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                    <a href="{{ route('agency.applications.index') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
                         Applications
                     </a>
                 @else
-                    <a href="{{ route('guard.profile.show') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                    <a href="{{ route('applicant.dashboard') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                        Dashboard
+                    </a>
+
+                    <a href="{{ route('applicant.profile.show') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
                         My Profile
                     </a>
 
-                    <a href="#" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
+                    <a href="{{ route('applicant.applications.index') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
                         My Applications
                     </a>
 
@@ -259,7 +315,7 @@
 
                 <form
                     method="POST"
-                    action="{{ auth()->user()->hasRole('agency') ? route('agency.logout') : route('guard.logout') }}"
+                    action="{{ auth()->user()->hasRole('agency') ? route('agency.logout') : route('applicant.logout') }}"
                     class="mt-3"
                 >
                     @csrf

@@ -10,29 +10,31 @@ use Illuminate\View\View;
 
 class GuardLoginController extends Controller
 {
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('guard.auth.login');
+        return redirect()->route('home')->with('open_login_modal', true);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+            $credentials = $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required', 'string'],
+            ]);
+
+            $request->merge(['account_type' => 'applicant']);
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withErrors([
                     'email' => 'Invalid email or password.',
                 ])
-                ->onlyInput('email');
+                ->onlyInput('email', 'account_type');
         }
 
         $request->session()->regenerate();
 
-        return redirect()->route('guard.home');
+        return redirect()->route('applicant.dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -42,6 +44,6 @@ class GuardLoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('guard.login');
+        return redirect()->route('applicant.login');
     }
 }

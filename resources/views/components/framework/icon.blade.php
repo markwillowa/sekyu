@@ -1,11 +1,11 @@
 @props([
     'name',
-    'style' => 'o',
+    'variant' => 'o',
     'class' => 'h-5 w-5',
 ])
 
 @php
-    $component = match ($style) {
+    $component = match ($variant) {
         's' => 'heroicon-s-' . $name,
         'm' => 'heroicon-m-' . $name,
         default => 'heroicon-o-' . $name,

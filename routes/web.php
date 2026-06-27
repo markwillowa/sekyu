@@ -3,6 +3,10 @@
 use App\Http\Controllers\Agency\Auth\AgencyLoginController;
 use App\Http\Controllers\Agency\Auth\AgencyRegisterController;
 use App\Http\Controllers\Agency\JobPostController;
+use App\Http\Controllers\Agency\WorkflowTemplateController;
+use App\Http\Controllers\Agency\WorkflowTemplateStepController;
+use App\Http\Controllers\Agency\JobApplicationController as AgencyJobApplicationController;
+use App\Http\Controllers\Guard\JobApplicationController as GuardJobApplicationController;
 use App\Http\Controllers\Guard\Auth\GuardLoginController;
 use App\Http\Controllers\Guard\Auth\GuardRegisterController;
 use App\Http\Controllers\Guard\ProfileController;
@@ -10,6 +14,8 @@ use App\Http\Controllers\Pro\ProController;
 use App\Http\Controllers\Pro\ProLoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Public\JobController;
+use App\Http\Controllers\Public\JobApplicationController;
+use App\Http\Controllers\Public\SavedJobController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])
@@ -18,7 +24,15 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('/jobs', [JobController::class, 'index'])
     ->name('jobs.index');
 
-Route::redirect('/login', '/pro/login')
+Route::post('/jobs/{jobPost}/apply', [JobApplicationController::class, 'store'])
+    ->name('jobs.apply')
+    ->middleware('auth');
+
+Route::post('/jobs/{jobPost}/toggle-save', [SavedJobController::class, 'toggle'])
+    ->name('jobs.toggle-save')
+    ->middleware('auth');
+
+Route::get('/login', [GuardLoginController::class, 'create'])
     ->name('login');
 
 /*
@@ -27,8 +41,8 @@ Route::redirect('/login', '/pro/login')
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('guard')
-    ->name('guard.')
+Route::prefix('applicant')
+    ->name('applicant.')
     ->group(function () {
         Route::middleware('guest')->group(function () {
             Route::get('/login', [GuardLoginController::class, 'create'])
@@ -48,8 +62,12 @@ Route::prefix('guard')
             Route::post('/logout', [GuardLoginController::class, 'destroy'])
                 ->name('logout');
 
-            Route::view('/home', 'guard.home')
-                ->name('home');
+            Route::get('/dashboard', [\App\Http\Controllers\Guard\DashboardController::class, 'index'])
+                ->name('dashboard');
+
+            Route::get('/home', function() {
+                return redirect()->route('applicant.dashboard');
+            })->name('home');
 
             Route::get('/profile/preview', [ProfileController::class, 'preview'])
                 ->name('profile.preview');
@@ -57,9 +75,83 @@ Route::prefix('guard')
             Route::get('/profile/{section?}', [ProfileController::class, 'show'])
                 ->name('profile.show');
 
-            Route::get('/agency/dashboard', function () {
-                return view('agency.dashboard');
-            })->name('agency.dashboard');
+            Route::post('/profile/basic-information', [ProfileController::class, 'updateBasicInformation'])
+                ->name('profile.update-basic-information');
+
+            Route::post('/profile/contact-details', [ProfileController::class, 'updateContactDetails'])
+                ->name('profile.update-contact-details');
+
+            Route::post('/profile/physical-details', [ProfileController::class, 'updatePhysicalDetails'])
+                ->name('profile.update-physical-details');
+
+            Route::post('/profile/emergency-contacts', [ProfileController::class, 'storeEmergencyContact'])
+                ->name('profile.store-emergency-contact');
+
+            Route::patch('/profile/emergency-contacts/{contact}', [ProfileController::class, 'updateEmergencyContact'])
+                ->name('profile.update-emergency-contact');
+
+            Route::delete('/profile/emergency-contacts/{contact}', [ProfileController::class, 'deleteEmergencyContact'])
+                ->name('profile.delete-emergency-contact');
+
+            Route::post('/profile/education', [ProfileController::class, 'storeEducation'])
+                ->name('profile.store-education');
+
+            Route::patch('/profile/education/{education}', [ProfileController::class, 'updateEducation'])
+                ->name('profile.update-education');
+
+            Route::delete('/profile/education/{education}', [ProfileController::class, 'deleteEducation'])
+                ->name('profile.delete-education');
+
+            Route::post('/profile/certifications', [ProfileController::class, 'storeCertification'])
+                ->name('profile.store-certification');
+
+            Route::patch('/profile/certifications/{certification}', [ProfileController::class, 'updateCertification'])
+                ->name('profile.update-certification');
+
+            Route::delete('/profile/certifications/{certification}', [ProfileController::class, 'deleteCertification'])
+                ->name('profile.delete-certification');
+
+            Route::post('/profile/work-experience', [ProfileController::class, 'storeWorkExperience'])
+                ->name('profile.store-work-experience');
+
+            Route::patch('/profile/work-experience/{experience}', [ProfileController::class, 'updateWorkExperience'])
+                ->name('profile.update-work-experience');
+
+            Route::delete('/profile/work-experience/{experience}', [ProfileController::class, 'deleteWorkExperience'])
+                ->name('profile.delete-work-experience');
+
+            Route::post('/profile/licenses', [ProfileController::class, 'storeLicense'])
+                ->name('profile.store-license');
+
+            Route::patch('/profile/licenses/{license}', [ProfileController::class, 'updateLicense'])
+                ->name('profile.update-license');
+
+            Route::delete('/profile/licenses/{license}', [ProfileController::class, 'deleteLicense'])
+                ->name('profile.delete-license');
+
+            Route::post('/profile/skills', [ProfileController::class, 'storeSkill'])
+                ->name('profile.store-skill');
+
+            Route::patch('/profile/skills/{skill}', [ProfileController::class, 'updateSkill'])
+                ->name('profile.update-skill');
+
+            Route::delete('/profile/skills/{skill}', [ProfileController::class, 'deleteSkill'])
+                ->name('profile.delete-skill');
+
+            Route::post('/profile/languages', [ProfileController::class, 'storeLanguage'])
+                ->name('profile.store-language');
+
+            Route::patch('/profile/languages/{language}', [ProfileController::class, 'updateLanguage'])
+                ->name('profile.update-language');
+
+            Route::delete('/profile/languages/{language}', [ProfileController::class, 'deleteLanguage'])
+                ->name('profile.delete-language');
+
+            Route::get('/applications', [GuardJobApplicationController::class, 'index'])
+                ->name('applications.index');
+
+            Route::get('/applications/{application}', [GuardJobApplicationController::class, 'show'])
+                ->name('applications.show');
         });
     });
 
@@ -152,5 +244,28 @@ Route::prefix('agency')
                     Route::delete('/{jobPost}', [JobPostController::class, 'destroy'])
                         ->name('destroy');
                 });
+
+            Route::resource('workflow-templates', WorkflowTemplateController::class);
+            Route::post('workflow-templates/{workflowTemplate}/steps', [WorkflowTemplateStepController::class, 'store'])
+                ->name('workflow-templates.steps.store');
+            Route::delete('workflow-templates/{workflowTemplate}/steps/{step}', [WorkflowTemplateStepController::class, 'destroy'])
+                ->name('workflow-templates.steps.destroy');
+            Route::post('workflow-templates/{workflowTemplate}/steps/reorder', [WorkflowTemplateStepController::class, 'reorder'])
+                ->name('workflow-templates.steps.reorder');
+
+            Route::get('/applications', [AgencyJobApplicationController::class, 'index'])
+                ->name('applications.index');
+
+            Route::get('/applications/{application}', [AgencyJobApplicationController::class, 'show'])
+                ->name('applications.show');
+
+            Route::get('/kanban', [AgencyJobApplicationController::class, 'kanban'])
+                ->name('applications.kanban');
+
+            Route::post('/applications/{application}/move', [AgencyJobApplicationController::class, 'move'])
+                ->name('applications.move');
+
+            Route::get('/guards/{guardProfile}', [AgencyJobApplicationController::class, 'showGuardProfile'])
+                ->name('guard-profile.show');
         });
     });

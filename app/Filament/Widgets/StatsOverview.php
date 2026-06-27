@@ -11,7 +11,7 @@ class StatsOverview extends StatsOverviewWidget
     {
         return [
             Stat::make('Security Guards', '0')
-                ->description('Registered guard accounts'),
+                ->description('Registered applicant accounts'),
 
             Stat::make('Agencies', '0')
                 ->description('Registered security agencies'),

@@ -8,10 +8,11 @@
         This helps agencies better understand your qualifications.
     </p>
 
-    <a
+    <x-framework.buttons.primary
         href="#"
-        class="mt-5 inline-flex rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+        size="md"
+        @click.prevent="$dispatch('open-modal', 'add-education')"
     >
         Add Education
-    </a>
+    </x-framework.buttons.primary>
 </div>

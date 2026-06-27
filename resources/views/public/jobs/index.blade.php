@@ -1,20 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-    <div x-data="{
-        mobileFiltersOpen: false,
-        showDetailsPane: false,
-        activeJob: null,
-        jobs: {{ $jobs->getCollection()->concat($randomJobs)->unique('id')->toJson() }},
-        openDetails(id) {
-            this.activeJob = id;
-            this.showDetailsPane = true;
-        }
-    }">
+    <div x-data="jobIndex({
+        savedJobIds: {{ auth()->check() ? auth()->user()->savedJobs->pluck('id')->toJson() : '[]' }},
+        isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
+        loginUrl: '{{ route('login') }}',
+        csrfToken: '{{ csrf_token() }}'
+    })">
         @include('public.jobs.components.hero')
 
-        <x-framework.layout.section class="bg-slate-50 py-12" title="">
-            <div class="mx-auto max-w-[1400px] px-6">
+        <div class="bg-slate-50 py-12 min-h-screen">
+            <div class="mx-auto max-w-7xl px-6">
 
                 <div class="flex flex-col gap-8 lg:flex-row">
 
@@ -26,8 +22,8 @@
                     </aside>
 
                     {{-- Main Content - Job List Only --}}
-                    <div class="flex flex-col flex-1 gap-8">
-                        <main class="w-full flex flex-col gap-6">
+                    <div class="flex flex-col flex-1 gap-8 min-w-0">
+                        <main class="w-full flex flex-col gap-8">
                             {{-- Toolbar --}}
                             <div class="mb-2">
                                 @include('public.jobs.components.toolbar')
@@ -35,27 +31,51 @@
 
                             {{-- Job List - Now Grid for better use of space if details are hidden --}}
                             <div class="grid grid-cols-1 gap-8">
-                                {{-- 4 Random Jobs on Top --}}
-                                @foreach($randomJobs as $job)
-                                    @if($job->is_featured)
-                                        @include('public.jobs.components.featured-card', ['job' => $job])
-                                    @else
-                                        @include('public.jobs.components.job-card', ['job' => $job])
-                                    @endif
-                                @endforeach
+                                {{-- Saved Jobs on Top --}}
+                                @if(auth()->check() && $savedJobs->isNotEmpty())
+                                    {{-- Divider --}}
+                                    <div class="relative py-8">
+                                        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                            <div class="w-full border-t border-slate-200"></div>
+                                        </div>
+                                        <div class="relative flex justify-center">
+                                            <span class="bg-slate-50 px-4 text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Your Saved Jobs</span>
+                                        </div>
+                                    </div>
+                                    @foreach($savedJobs as $job)
+                                        @if($job->is_featured)
+                                            @include('public.jobs.components.featured-card', ['job' => $job])
+                                        @else
+                                            @include('public.jobs.components.job-card', ['job' => $job])
+                                        @endif
+                                    @endforeach
+                                @endif
 
-                                {{-- Divider --}}
-                                <div class="relative py-4">
-                                    <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                                        <div class="w-full border-t border-slate-200"></div>
+                                {{-- 4 Random Jobs on Top - Only show if not filtered --}}
+                                @if(!$isFiltered)
+                                    @foreach($randomJobs as $job)
+                                        @if($job->is_featured)
+                                            @include('public.jobs.components.featured-card', ['job' => $job])
+                                        @else
+                                            @include('public.jobs.components.job-card', ['job' => $job])
+                                        @endif
+                                    @endforeach
+
+                                    {{-- Divider --}}
+                                    <div class="relative py-8">
+                                        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                            <div class="w-full border-t border-slate-200"></div>
+                                        </div>
+                                        <div class="relative flex justify-center">
+                                            <span class="bg-slate-50 px-4 text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Latest Opportunities</span>
+                                        </div>
                                     </div>
-                                    <div class="relative flex justify-center">
-                                        <span class="bg-slate-50 px-3 text-sm font-bold text-slate-500 uppercase tracking-widest">Featured & Recommended</span>
-                                    </div>
-                                </div>
+                                @endif
 
                                 @forelse ($jobs as $job)
-                                    @continue($randomJobs->contains('id', $job->id))
+                                    @if(!$isFiltered)
+                                        @continue($randomJobs->contains('id', $job->id))
+                                    @endif
                                     @if($job->is_featured)
                                         @include('public.jobs.components.featured-card', ['job' => $job])
                                     @else
@@ -71,9 +91,8 @@
                         </main>
                     </div>
                 </div>
-
             </div>
-        </x-framework.layout.section>
+        </div>
 
         {{-- Mobile Filter Drawer --}}
         <div
@@ -104,7 +123,7 @@
                 </div>
 
                 <div class="p-6 border-t border-slate-100">
-                    <x-framework.buttons.primary @click="mobileFiltersOpen = false" class="w-full py-4 rounded-2xl shadow-lg">
+                    <x-framework.buttons.primary @click="mobileFiltersOpen = false; submitFilterForm()" class="w-full py-4 rounded-2xl shadow-lg">
                         Apply Filters
                     </x-framework.buttons.primary>
                 </div>
@@ -114,7 +133,8 @@
         {{-- Master Detail (Job Details Drawer) --}}
         <div
             x-show="showDetailsPane"
-            class="fixed inset-0 z-[100]"
+            x-cloak
+            class="fixed inset-0 z-[1000]"
             style="display: none;"
         >
             {{-- Backdrop (30% opacity as requested) --}}
@@ -145,7 +165,7 @@
                 {{-- Details Content --}}
                 <div class="flex-1 overflow-y-auto scroll-smooth">
                     @foreach($jobs->getCollection()->concat($randomJobs)->unique('id') as $job)
-                        <div x-show="activeJob === {{ $job->id }}" style="display: none;">
+                        <div x-show="activeJob == {{ $job->id }}" x-cloak style="display: none;">
                             @include('public.jobs.components.details-pane', ['job' => $job])
                         </div>
                     @endforeach
@@ -154,3 +174,57 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('jobIndex', (config) => ({
+            mobileFiltersOpen: false,
+            showDetailsPane: false,
+            activeJob: null,
+            savedJobIds: config.savedJobIds || [],
+
+            isSaved(id) {
+                return this.savedJobIds.includes(id);
+            },
+
+            async toggleSave(id) {
+                if (!config.isLoggedIn) {
+                    window.location.href = config.loginUrl;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/jobs/${id}/toggle-save`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': config.csrfToken,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.is_saved) {
+                            if (!this.savedJobIds.includes(id)) {
+                                this.savedJobIds.push(id);
+                            }
+                        } else {
+                            this.savedJobIds = this.savedJobIds.filter(savedId => savedId !== id);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error toggling save:', error);
+                }
+            },
+
+            openDetails(id) {
+                console.log('Opening details for job:', id);
+                this.activeJob = id;
+                this.showDetailsPane = true;
+            }
+        }));
+    });
+</script>
+@endpush

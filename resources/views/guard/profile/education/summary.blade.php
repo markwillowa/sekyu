@@ -2,7 +2,7 @@
     $latestEducation = $educations->sortByDesc('ended_year')->first();
 @endphp
 
-<section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+<x-framework.layout.card>
     <div class="flex items-center justify-between gap-4">
         <div>
             <h2 class="text-xl font-bold text-slate-900">
@@ -14,12 +14,13 @@
             </p>
         </div>
 
-        <a
+        <x-framework.buttons.primary
             href="#"
-            class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+            size="sm"
+            @click.prevent="$dispatch('open-modal', 'add-education')"
         >
             Add Education
-        </a>
+        </x-framework.buttons.primary>
     </div>
 
     <div class="mt-6 grid gap-4 sm:grid-cols-3">
@@ -47,4 +48,4 @@
             </div>
         </div>
     </div>
-</section>
+</x-framework.layout.card>

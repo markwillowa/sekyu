@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Agency;
+use App\Models\MasterLocation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -28,6 +29,7 @@ class AgencySeeder extends Seeder
         if ($agencyUser && !Agency::where('owner_id', $agencyUser->id)->exists()) {
             Agency::create([
                 'owner_id' => $agencyUser->id,
+                'location_id' => MasterLocation::where('code', 'makati')->first()?->id,
                 'name' => 'Elite Security Services',
                 'slug' => Str::slug('Elite Security Services'),
                 'license_number' => 'PSA-2026-0001',

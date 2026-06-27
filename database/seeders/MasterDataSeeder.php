@@ -82,6 +82,8 @@ class MasterDataSeeder extends Seeder
         $this->seedWorkLocationTypes();
         $this->seedSalaryTypes();
         $this->seedJobStatuses();
+        $this->seedLocations();
+        $this->seedWorkflowStepNames();
     }
 
     private function seedSimple(string $table, array $names): void
@@ -359,5 +361,48 @@ class MasterDataSeeder extends Seeder
         ];
 
         $this->seedSimple('master_job_statuses', $names);
+    }
+
+    private function seedLocations(): void
+    {
+        $this->seedSimple('master_locations', [
+            'Quezon City',
+            'Manila',
+            'Makati',
+            'Pasig',
+            'Taguig',
+            'Cebu City',
+            'Davao City',
+            'Mandaluyong',
+            'Alabang',
+            'Iloilo City',
+            'Bacolod City',
+            'Cagayan de Oro',
+            'Zamboanga City',
+            'Baguio City',
+            'Angeles City',
+        ]);
+    }
+
+    private function seedWorkflowStepNames(): void
+    {
+        $this->seedSimple('master_workflow_step_names', [
+            'Application Received',
+            'Resume Screening',
+            'Initial Interview',
+            'Technical Assessment',
+            'Background Check',
+            'Medical Examination',
+            'Drug Testing',
+            'Panel Interview',
+            'Client Interview',
+            'Final Interview',
+            'Job Offer',
+            'Onboarding',
+            'Training',
+            'Deployment',
+            'Rejected',
+            'Withdrawn',
+        ]);
     }
 }

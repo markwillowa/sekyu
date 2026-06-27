@@ -19,6 +19,17 @@
 
                         Create Job Post
                     </x-framework.buttons.primary>
+
+                    <x-framework.buttons.secondary
+                        href="{{ route('agency.workflow-templates.index') }}"
+                    >
+                        <x-framework.icon
+                            name="arrow-path"
+                            class="mr-2 h-5 w-5"
+                        />
+
+                        Workflow Templates
+                    </x-framework.buttons.secondary>
                 </x-slot:actions>
             </x-framework.layout.page-header>
 
@@ -61,6 +72,7 @@
                         title="Applications"
                         :value="$applicationsCount"
                         color="blue"
+                        href="{{ route('agency.applications.index') }}"
                     >
                         <x-slot:icon>
                             <x-framework.icon
@@ -135,7 +147,7 @@
                                     <x-framework.table.td>
                                         @php
                                             $color = match(optional($job->status)->code) {
-                                                'published' => 'green',
+                                                'active' => 'green',
                                                 'draft' => 'amber',
                                                 default => 'slate'
                                             };

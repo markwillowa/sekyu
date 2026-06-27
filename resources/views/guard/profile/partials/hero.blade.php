@@ -26,26 +26,26 @@
                     </p>
 
                     <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
-                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                        <x-framework.feedback.badge color="amber">
                             {{ $completion }}% Profile Complete
-                        </span>
+                        </x-framework.feedback.badge>
 
-                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        <x-framework.feedback.badge color="slate">
                             {{ $workExperiences->count() }} Work Records
-                        </span>
+                        </x-framework.feedback.badge>
 
-                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        <x-framework.feedback.badge color="slate">
                             {{ $licenses->count() }} Licenses
-                        </span>
+                        </x-framework.feedback.badge>
 
-                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        <x-framework.feedback.badge color="slate">
                             {{ $skills->count() }} Skills
-                        </span>
+                        </x-framework.feedback.badge>
                     </div>
                 </div>
             </div>
 
-            <div class="w-full rounded-xl border border-slate-200 bg-slate-50 p-4 sm:max-w-xs sm:bg-white sm:p-0 sm:border-0 lg:max-w-xs">
+            <x-framework.layout.card class="w-full sm:max-w-xs" padding="p-4 sm:p-6">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-semibold text-slate-600">
                         Profile Strength
@@ -64,21 +64,19 @@
                 </div>
 
                 <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <a
-                        href="{{ route('guard.profile.show', 'personal') }}"
-                        class="rounded-lg bg-slate-900 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
+                    <x-framework.buttons.primary
+                        href="{{ route('applicant.profile.show', 'personal') }}"
                     >
                         Edit Profile
-                    </a>
+                    </x-framework.buttons.primary>
 
-                    <a
-                        href="{{ route('guard.profile.preview') }}"
-                        class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    <x-framework.buttons.secondary
+                        href="{{ route('applicant.profile.preview') }}"
                     >
                         Preview
-                    </a>
+                    </x-framework.buttons.secondary>
                 </div>
-            </div>
+            </x-framework.layout.card>
 
         </div>
     </div>

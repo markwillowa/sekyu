@@ -1,4 +1,4 @@
-<section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+<x-framework.layout.card>
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
             <h2 class="text-xl font-bold text-slate-900">
@@ -10,9 +10,9 @@
             </p>
         </div>
 
-        <a href="#" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+        <x-framework.buttons.primary href="#" size="sm">
             Add Specialization
-        </a>
+        </x-framework.buttons.primary>
     </div>
 
     @if ($specializations->isEmpty())
@@ -24,10 +24,10 @@
     @else
         <div class="mt-6 flex flex-wrap gap-2">
             @foreach ($specializations as $specialization)
-                <span class="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
+                <x-framework.feedback.badge color="slate">
                     {{ $specialization->specialization?->name ?? 'Specialization' }}
-                </span>
+                </x-framework.feedback.badge>
             @endforeach
         </div>
     @endif
-</section>
+</x-framework.layout.card>

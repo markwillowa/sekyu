@@ -4,14 +4,14 @@
 
     @include('guard.profile.partials.hero')
 
-    <section class="bg-slate-50 py-12">
+    <section class="bg-slate-50 py-10">
         <div class="mx-auto grid max-w-7xl gap-8 px-6 lg:grid-cols-12">
 
             <aside class="lg:col-span-3">
                 @include('guard.profile.partials.sidebar')
             </aside>
 
-            <main class="space-y-8 lg:col-span-9">
+            <main x-data class="space-y-8 lg:col-span-9">
                 @switch($section)
                     @case('overview')
                         @include('guard.profile.overview.index')

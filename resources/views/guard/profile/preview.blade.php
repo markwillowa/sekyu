@@ -6,7 +6,7 @@
 
             <div class="mb-6">
                 <a
-                    href="{{ route('guard.profile.show') }}"
+                    href="{{ route('applicant.profile.show') }}"
                     class="text-sm font-semibold text-amber-600 hover:text-amber-700"
                 >
                     ← Back to Profile Editor
@@ -45,7 +45,7 @@
                         </div>
 
                         <a
-                            href="{{ route('guard.profile.show', 'personal') }}"
+                            href="{{ route('applicant.profile.show', 'personal') }}"
                             class="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
                         >
                             Edit Profile

@@ -40,7 +40,7 @@ return [
         /*
          * When using the "HasModels" trait and passing raw IDs to syncModels,
          * attachModels, or detachModels, this model class will be used to
-         * resolve those IDs. If null, defaults to the guard's model.
+         * resolve those IDs. If null, defaults to the applicant's model.
          */
         'default_model' => null,
     ],

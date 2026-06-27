@@ -9,9 +9,20 @@
     </div>
 
     <form method="GET" action="{{ route('jobs.index') }}" class="flex items-center gap-3">
-        {{-- Pass through existing search params --}}
+        {{-- Pass through existing search and filter params --}}
         @if(request('q')) <input type="hidden" name="q" value="{{ request('q') }}"> @endif
         @if(request('location')) <input type="hidden" name="location" value="{{ request('location') }}"> @endif
+        @if(request('salary_min')) <input type="hidden" name="salary_min" value="{{ request('salary_min') }}"> @endif
+        @if(request('type'))
+            @foreach(request('type') as $t)
+                <input type="hidden" name="type[]" value="{{ $t }}">
+            @endforeach
+        @endif
+        @if(request('loc'))
+            @foreach(request('loc') as $l)
+                <input type="hidden" name="loc[]" value="{{ $l }}">
+            @endforeach
+        @endif
 
         <label for="sort" class="text-sm font-medium text-slate-600">Sort by:</label>
         <x-framework.forms.select id="sort" name="sort" onchange="this.form.submit()" class="py-2 pl-3 pr-10 text-sm">

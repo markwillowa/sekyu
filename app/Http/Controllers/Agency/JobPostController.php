@@ -28,7 +28,14 @@ class JobPostController extends Controller
 
     public function create()
     {
+        $agency = auth()->user()->agency;
+        abort_if(! $agency, 403);
+
         return view('agency.job-posts.create', [
+            'workflowTemplates' => $agency->workflowTemplates()
+                ->orderBy('name')
+                ->pluck('name', 'id'),
+
             'employmentTypes' => MasterEmploymentType::where('is_active', true)
                 ->orderBy('sort_order')
                 ->pluck('name', 'id'),
@@ -55,6 +62,7 @@ class JobPostController extends Controller
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'workflow_template_id' => ['required', 'exists:workflow_templates,id'],
             'employment_type_id' => ['required', 'exists:master_employment_types,id'],
             'work_location_type_id' => ['required', 'exists:master_work_location_types,id'],
             'city' => ['nullable', 'string', 'max:255'],
@@ -94,6 +102,10 @@ class JobPostController extends Controller
 
         return view('agency.job-posts.edit', [
             'jobPost' => $jobPost,
+            'workflowTemplates' => $agency->workflowTemplates()
+                ->orderBy('name')
+                ->pluck('name', 'id'),
+
             'employmentTypes' => MasterEmploymentType::where('is_active', true)
                 ->orderBy('sort_order')
                 ->pluck('name', 'id'),
@@ -120,6 +132,7 @@ class JobPostController extends Controller
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'workflow_template_id' => ['required', 'exists:workflow_templates,id'],
             'employment_type_id' => ['required', 'exists:master_employment_types,id'],
             'work_location_type_id' => ['required', 'exists:master_work_location_types,id'],
             'city' => ['nullable', 'string', 'max:255'],

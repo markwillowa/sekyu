@@ -27,7 +27,7 @@
 
                 <form
                     method="POST"
-                    action="{{ route('guard.login.store') }}"
+                    action="{{ route('applicant.login.store') }}"
                     class="mt-8 space-y-5"
                 >
                     @csrf
@@ -97,7 +97,7 @@
                         Don’t have an account yet?
 
                         <a
-                            href="{{ route('guard.register') }}"
+                            href="{{ route('applicant.register') }}"
                             class="font-semibold text-amber-600 transition hover:text-amber-700"
                         >
                             Sign Up Now!

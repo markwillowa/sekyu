@@ -10,11 +10,11 @@
     ];
 @endphp
 
-<div class="sticky top-28 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+<x-framework.layout.card class="sticky top-28" padding="p-4">
     <nav class="space-y-1 text-sm font-medium">
         @foreach ($items as $key => $label)
             <a
-                href="{{ route('guard.profile.show', $key) }}"
+                href="{{ route('applicant.profile.show', $key) }}"
                 class="block rounded-lg px-4 py-2 transition
                     {{ $section === $key
                         ? 'bg-slate-900 text-white'
@@ -24,4 +24,4 @@
             </a>
         @endforeach
     </nav>
-</div>
+</x-framework.layout.card>

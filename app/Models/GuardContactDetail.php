@@ -13,6 +13,7 @@ class GuardContactDetail extends Model
         'alternate_mobile_number',
         'email',
         'current_address',
+        'permanent_address',
         'city',
         'province',
         'region',

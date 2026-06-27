@@ -46,6 +46,14 @@
                                 placeholder="Select employment type"
                             />
 
+                            <x-framework.forms.select
+                                name="workflow_template_id"
+                                label="Workflow Template"
+                                :options="$workflowTemplates"
+                                placeholder="Select workflow template"
+                                required
+                            />
+
                             <x-framework.forms.input
                                 name="vacancies"
                                 type="number"

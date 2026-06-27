@@ -74,7 +74,7 @@
 
                                 <x-framework.table.td>
 
-                                    <x-framework.feedback.badge :color="$job->status && $job->status->code === 'published' ? 'green' : 'amber'">
+                                    <x-framework.feedback.badge :color="$job->status && $job->status->code === 'active' ? 'green' : 'amber'">
                                         {{ optional($job->status)->name }}
                                     </x-framework.feedback.badge>
 

@@ -41,19 +41,95 @@
         </div>
 
         <div class="flex gap-2">
-            <a
+            <x-framework.buttons.secondary
                 href="#"
-                class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                size="sm"
+                @click.prevent="$dispatch('open-modal', 'edit-education-{{ $education->id }}')"
             >
                 Edit
-            </a>
+            </x-framework.buttons.secondary>
 
-            <a
-                href="#"
-                class="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+            <x-framework.feedback.modal
+                name="edit-education-{{ $education->id }}"
+                title="Edit Education"
+                description="Update your educational background."
             >
-                Delete
-            </a>
+                <form action="{{ route('applicant.profile.update-education', $education) }}" method="POST" class="space-y-6">
+                    @csrf
+                    @method('PATCH')
+
+                    <div class="grid gap-6 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <x-framework.forms.input
+                                label="School Name"
+                                name="school_name"
+                                :value="$education->school_name"
+                                required
+                            />
+                        </div>
+
+                        <x-framework.forms.input
+                            label="Level (e.g., High School, College)"
+                            name="level"
+                            :value="$education->level"
+                            required
+                        />
+
+                        <x-framework.forms.input
+                            label="Course / Strand"
+                            name="course_or_strand"
+                            :value="$education->course_or_strand"
+                        />
+
+                        <x-framework.forms.input
+                            label="Started Year"
+                            name="started_year"
+                            type="number"
+                            min="1900"
+                            max="{{ date('Y') }}"
+                            :value="$education->started_year"
+                        />
+
+                        <x-framework.forms.input
+                            label="Ended Year"
+                            name="ended_year"
+                            type="number"
+                            min="1900"
+                            max="{{ date('Y') + 10 }}"
+                            :value="$education->ended_year"
+                        />
+
+                        <div class="sm:col-span-2">
+                            <x-framework.forms.textarea
+                                label="Description / Achievements"
+                                name="description"
+                                rows="3"
+                            >{{ $education->description }}</x-framework.forms.textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-8">
+                        <x-framework.buttons.secondary
+                            type="button"
+                            @click="$dispatch('close-modal', 'edit-education-{{ $education->id }}')"
+                        >
+                            Cancel
+                        </x-framework.buttons.secondary>
+
+                        <x-framework.buttons.primary type="submit">
+                            Save Changes
+                        </x-framework.buttons.primary>
+                    </div>
+                </form>
+            </x-framework.feedback.modal>
+
+            <form action="{{ route('applicant.profile.delete-education', $education) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this education record?')">
+                @csrf
+                @method('DELETE')
+                <x-framework.buttons.secondary type="submit" size="sm" class="text-red-600 border-red-200 hover:bg-red-50">
+                    Delete
+                </x-framework.buttons.secondary>
+            </form>
         </div>
     </div>
 </article>

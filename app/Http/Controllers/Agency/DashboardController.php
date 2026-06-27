@@ -15,7 +15,7 @@ class DashboardController extends Controller
 
         $activeJobsCount = $agency->jobPosts()
             ->whereHas('status', function ($query) {
-                $query->where('code', 'published');
+                $query->where('code', 'active');
             })
             ->count();
 
@@ -31,10 +31,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $applicationsCount = $agency->jobApplications()->count();
+
         return view('agency.dashboard', [
             'activeJobsCount' => $activeJobsCount,
             'draftJobsCount' => $draftJobsCount,
-            'applicationsCount' => 0, // Placeholder
+            'applicationsCount' => $applicationsCount,
             'interviewsCount' => 0,   // Placeholder
             'latestJobPosts' => $latestJobPosts,
         ]);

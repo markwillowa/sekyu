@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -40,5 +41,15 @@ class User extends Authenticatable
     public function agency()
     {
         return $this->hasOne(Agency::class, 'owner_id');
+    }
+
+    public function jobApplications(): HasMany
+    {
+        return $this->hasMany(JobApplication::class, 'guard_id');
+    }
+
+    public function savedJobs()
+    {
+        return $this->belongsToMany(JobPost::class, 'saved_jobs')->withTimestamps();
     }
 }

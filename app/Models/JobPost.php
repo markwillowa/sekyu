@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobPost extends Model
 {
     use HasFactory;
     protected $fillable = [
         'agency_id',
+        'location_id',
         'title',
         'slug',
         'is_featured',
@@ -27,6 +29,7 @@ class JobPost extends Model
         'benefits',
         'vacancies',
         'job_status_id',
+        'workflow_template_id',
         'published_at',
         'expires_at',
     ];
@@ -66,5 +69,30 @@ class JobPost extends Model
     public function workLocationType()
     {
         return $this->belongsTo(MasterWorkLocationType::class, 'work_location_type_id');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(MasterLocation::class, 'location_id');
+    }
+
+    public function workflowTemplate(): BelongsTo
+    {
+        return $this->belongsTo(WorkflowTemplate::class);
+    }
+
+    public function savedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'saved_jobs')->withTimestamps();
+    }
+
+    public function isSavedBy(User $user)
+    {
+        return $this->savedByUsers()->where('user_id', $user->id)->exists();
+    }
+
+    public function applications(): HasMany
+    {
+        return $this->hasMany(JobApplication::class, 'job_id');
     }
 }

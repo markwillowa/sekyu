@@ -12,8 +12,12 @@
     @endif
 
     {{-- Save Button --}}
-    <button type="button" class="absolute right-6 top-6 z-10 text-slate-300 hover:text-red-500 transition-colors" @click.stop="">
-        <x-framework.icon name="heart" class="h-6 w-6" />
+    <button type="button"
+        class="absolute right-6 top-6 z-10 transition-colors"
+        :class="isSaved({{ $job->id }}) ? 'text-rose-500' : 'text-slate-300 hover:text-rose-500'"
+        @click.stop="toggleSave({{ $job->id }})">
+        <x-framework.icon name="heart" class="h-6 w-6" variant="s" x-show="isSaved({{ $job->id }})" />
+        <x-framework.icon name="heart" class="h-6 w-6" variant="o" x-show="!isSaved({{ $job->id }})" />
     </button>
 
     <div class="flex flex-col md:flex-row gap-4 md:gap-6">
@@ -43,7 +47,7 @@
             <div class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
                 <span class="flex items-center gap-1.5 text-slate-500">
                     <x-framework.icon name="map-pin" class="h-4 w-4 text-slate-400" />
-                    {{ $job->city }}
+                    {{ $job->location?->name ?? $job->city }}
                 </span>
                 <span class="flex items-center gap-1.5 font-bold text-slate-900">
                     ₱{{ number_format($job->salary_min / 1000, 0) }}k - ₱{{ number_format($job->salary_max / 1000, 0) }}k

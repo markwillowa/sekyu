@@ -1,4 +1,4 @@
-<section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+<x-framework.layout.card>
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
             <h2 class="text-xl font-bold text-slate-900">
@@ -10,10 +10,79 @@
             </p>
         </div>
 
-        <a href="#" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+        <x-framework.buttons.primary
+            type="button"
+            size="sm"
+            @click.prevent="$dispatch('open-modal', 'add-emergency-contact')"
+        >
             Add Contact
-        </a>
+        </x-framework.buttons.primary>
     </div>
+
+    <x-framework.feedback.modal
+        name="add-emergency-contact"
+        title="Add Emergency Contact"
+        description="Add a person to contact in case of emergency."
+    >
+        <form action="{{ route('applicant.profile.store-emergency-contact') }}" method="POST" class="space-y-6">
+            @csrf
+
+            <div class="grid gap-6 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <x-framework.forms.input
+                        label="Full Name"
+                        name="name"
+                        required
+                    />
+                </div>
+
+                <x-framework.forms.select
+                    label="Relationship"
+                    name="master_relationship_id"
+                    :options="$relationships->pluck('name', 'id')"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="Mobile Number"
+                    name="mobile_number"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="Alternate Number"
+                    name="alternate_mobile_number"
+                />
+
+                <x-framework.forms.input
+                    label="Email Address"
+                    name="email"
+                    type="email"
+                />
+
+                <div class="sm:col-span-2">
+                    <x-framework.forms.textarea
+                        label="Address"
+                        name="address"
+                        rows="3"
+                    ></x-framework.forms.textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-8">
+                <x-framework.buttons.secondary
+                    type="button"
+                    @click="$dispatch('close-modal', 'add-emergency-contact')"
+                >
+                    Cancel
+                </x-framework.buttons.secondary>
+
+                <x-framework.buttons.primary type="submit">
+                    Add Contact
+                </x-framework.buttons.primary>
+            </div>
+        </form>
+    </x-framework.feedback.modal>
 
     @if ($emergencyContacts->isEmpty())
         <div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
@@ -51,17 +120,96 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <a href="#" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                            <x-framework.buttons.secondary
+                                type="button"
+                                size="sm"
+                                @click.prevent="$dispatch('open-modal', 'edit-emergency-contact-{{ $contact->id }}')"
+                            >
                                 Edit
-                            </a>
+                            </x-framework.buttons.secondary>
 
-                            <a href="#" class="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
-                                Delete
-                            </a>
+                            <x-framework.feedback.modal
+                                name="edit-emergency-contact-{{ $contact->id }}"
+                                title="Edit Emergency Contact"
+                                description="Update emergency contact information."
+                            >
+                                <form action="{{ route('applicant.profile.update-emergency-contact', $contact) }}" method="POST" class="space-y-6">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    <div class="grid gap-6 sm:grid-cols-2">
+                                        <div class="sm:col-span-2">
+                                            <x-framework.forms.input
+                                                label="Full Name"
+                                                name="name"
+                                                :value="$contact->name"
+                                                required
+                                            />
+                                        </div>
+
+                                        <x-framework.forms.select
+                                            label="Relationship"
+                                            name="master_relationship_id"
+                                            :options="$relationships->pluck('name', 'id')"
+                                            :selected="$contact->master_relationship_id"
+                                            required
+                                        />
+
+                                        <x-framework.forms.input
+                                            label="Mobile Number"
+                                            name="mobile_number"
+                                            :value="$contact->mobile_number"
+                                            required
+                                        />
+
+                                        <x-framework.forms.input
+                                            label="Alternate Number"
+                                            name="alternate_mobile_number"
+                                            :value="$contact->alternate_mobile_number"
+                                        />
+
+                                        <x-framework.forms.input
+                                            label="Email Address"
+                                            name="email"
+                                            type="email"
+                                            :value="$contact->email"
+                                        />
+
+                                        <div class="sm:col-span-2">
+                                            <x-framework.forms.textarea
+                                                label="Address"
+                                                name="address"
+                                                rows="3"
+                                            >{{ $contact->address }}</x-framework.forms.textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end gap-3 mt-8">
+                                        <x-framework.buttons.secondary
+                                            type="button"
+                                            @click="$dispatch('close-modal', 'edit-emergency-contact-{{ $contact->id }}')"
+                                        >
+                                            Cancel
+                                        </x-framework.buttons.secondary>
+
+                                        <x-framework.buttons.primary type="submit">
+                                            Save Changes
+                                        </x-framework.buttons.primary>
+                                    </div>
+                                </form>
+                            </x-framework.feedback.modal>
+
+                            <form action="{{ route('applicant.profile.delete-emergency-contact', $contact) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this contact?')">
+                                @csrf
+                                @method('DELETE')
+                                <x-framework.buttons.secondary type="submit" size="sm" class="text-red-600 border-red-200 hover:bg-red-50">
+                                    Delete
+                                </x-framework.buttons.secondary>
+                            </form>
                         </div>
                     </div>
                 </div>
             @endforeach
         </div>
     @endif
-</section>
+</x-framework.layout.card>

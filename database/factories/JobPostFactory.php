@@ -38,6 +38,7 @@ class JobPostFactory extends Factory
 
         return [
             'agency_id' => Agency::factory(),
+            'location_id' => DB::table('master_locations')->inRandomOrder()->first()?->id,
             'title' => $title,
             'slug' => Str::slug($title) . '-' . Str::random(5),
             'is_featured' => fake()->boolean(10),

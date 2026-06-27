@@ -27,7 +27,7 @@
     ];
 @endphp
 
-<section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+<x-framework.layout.card>
     <h2 class="text-xl font-bold text-slate-900">
         Profile Statistics
     </h2>
@@ -49,4 +49,4 @@
             </div>
         @endforeach
     </div>
-</section>
+</x-framework.layout.card>

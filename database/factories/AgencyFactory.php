@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Agency;
+use App\Models\MasterLocation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -22,6 +23,7 @@ class AgencyFactory extends Factory
         $name = fake()->company() . ' Security Agency';
         return [
             'owner_id' => User::factory(),
+            'location_id' => MasterLocation::inRandomOrder()->first()?->id,
             'name' => $name,
             'slug' => Str::slug($name),
             'license_number' => 'PSA-' . fake()->year() . '-' . fake()->unique()->numerify('####'),

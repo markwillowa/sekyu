@@ -1,4 +1,4 @@
-<section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+<x-framework.layout.card>
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-xl font-bold text-slate-900">
@@ -67,4 +67,4 @@
             </div>
         @endforeach
     </div>
-</section>
+</x-framework.layout.card>

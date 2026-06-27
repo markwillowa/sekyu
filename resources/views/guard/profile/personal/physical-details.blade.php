@@ -1,4 +1,4 @@
-<section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+<x-framework.layout.card>
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
             <h2 class="text-xl font-bold text-slate-900">
@@ -10,10 +10,69 @@
             </p>
         </div>
 
-        <a href="#" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+        <x-framework.buttons.primary
+            type="button"
+            size="sm"
+            @click.prevent="$dispatch('open-modal', 'edit-physical-details')"
+        >
             Edit
-        </a>
+        </x-framework.buttons.primary>
     </div>
+
+    <x-framework.feedback.modal
+        name="edit-physical-details"
+        title="Edit Physical Details"
+        description="Update your physical information below."
+    >
+        <form action="{{ route('applicant.profile.update-physical-details') }}" method="POST" class="space-y-6">
+            @csrf
+
+            <div class="grid gap-6 sm:grid-cols-2">
+                <x-framework.forms.input
+                    label="Height (cm)"
+                    name="height_cm"
+                    type="number"
+                    step="0.01"
+                    :value="$physicalDetail?->height_cm"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="Weight (kg)"
+                    name="weight_kg"
+                    type="number"
+                    step="0.01"
+                    :value="$physicalDetail?->weight_kg"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="Blood Type"
+                    name="blood_type"
+                    :value="$physicalDetail?->blood_type"
+                />
+
+                <x-framework.forms.input
+                    label="Body Type"
+                    name="body_type"
+                    :value="$physicalDetail?->body_type"
+                />
+            </div>
+
+            <div class="flex justify-end gap-3 mt-8">
+                <x-framework.buttons.secondary
+                    type="button"
+                    @click="$dispatch('close-modal', 'edit-physical-details')"
+                >
+                    Cancel
+                </x-framework.buttons.secondary>
+
+                <x-framework.buttons.primary type="submit">
+                    Save Changes
+                </x-framework.buttons.primary>
+            </div>
+        </form>
+    </x-framework.feedback.modal>
 
     <dl class="mt-6 grid gap-6 sm:grid-cols-2">
         <div>
@@ -36,4 +95,4 @@
             <dd class="mt-1 text-slate-900">{{ $physicalDetail?->distinguishing_marks ?? 'Not provided' }}</dd>
         </div>
     </dl>
-</section>
+</x-framework.layout.card>

@@ -10,7 +10,7 @@ class AgencyLoginController extends Controller
 {
     public function create()
     {
-        return view('agency.auth.login');
+        return redirect()->route('home')->with('open_login_modal', true);
     }
 
     public function store(Request $request)
@@ -19,6 +19,8 @@ class AgencyLoginController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+
+        $request->merge(['account_type' => 'agency']);
 
         $remember = $request->boolean('remember');
 
@@ -35,7 +37,7 @@ class AgencyLoginController extends Controller
                     ->withErrors([
                         'email' => 'This account is not registered as an agency.',
                     ])
-                    ->onlyInput('email');
+                    ->onlyInput('email', 'account_type');
             }
 
             return redirect()->intended(route('agency.dashboard'));
@@ -45,7 +47,7 @@ class AgencyLoginController extends Controller
             ->withErrors([
                 'email' => 'Invalid agency login credentials.',
             ])
-            ->onlyInput('email');
+            ->onlyInput('email', 'account_type');
     }
 
     public function destroy(Request $request)

@@ -3,7 +3,7 @@
     $photo = $profile?->getFirstMedia('profile-photo');
 @endphp
 
-<section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+<x-framework.layout.card>
     <div class="border-b border-slate-200 pb-5">
         <h2 class="text-xl font-bold text-slate-900">
             Uploaded Documents
@@ -63,4 +63,4 @@
             @endif
         </div>
     </div>
-</section>
+</x-framework.layout.card>
