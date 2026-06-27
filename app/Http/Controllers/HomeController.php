@@ -22,11 +22,11 @@ class HomeController extends Controller
             ->latest('published_at');
 
         // First, try to get featured jobs
-        $jobs = (clone $query)->where('is_featured', true)->inRandomOrder()->take(6)->get();
+        $jobs = (clone $query)->where('is_featured', true)->inRandomOrder()->take(4)->get();
 
         // If no featured jobs, get non-featured ones
         if ($jobs->isEmpty()) {
-            $jobs = $query->inRandomOrder()->take(6)->get();
+            $jobs = $query->inRandomOrder()->take(4)->get();
         }
 
         return view('welcome', compact('jobs'));

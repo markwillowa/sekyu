@@ -37,14 +37,10 @@
         </div>
 
         {{-- Jobs Grid --}}
-        <x-framework.layout.grid cols="2" class="gap-6">
+        <x-framework.layout.grid cols="4" class="gap-8">
 
             @forelse ($jobs as $job)
-                @if($job->is_featured)
-                    @include('public.jobs.components.featured-card', ['job' => $job])
-                @else
-                    @include('public.jobs.components.job-card', ['job' => $job])
-                @endif
+                @include('public.jobs.components.home-featured-card', ['job' => $job])
             @empty
                 <div class="col-span-full py-12 text-center">
                     <p class="text-slate-500">No job opportunities available at the moment.</p>
