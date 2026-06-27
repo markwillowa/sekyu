@@ -13,14 +13,6 @@
                 Add your academic history and security-related education.
             </p>
         </div>
-
-        <x-framework.buttons.primary
-            href="#"
-            size="sm"
-            @click.prevent="$dispatch('open-modal', 'add-education')"
-        >
-            Add Education
-        </x-framework.buttons.primary>
     </div>
 
     <div class="mt-6 grid gap-4 sm:grid-cols-3">

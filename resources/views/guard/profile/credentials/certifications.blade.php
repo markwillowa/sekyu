@@ -11,7 +11,7 @@
         </div>
 
         <x-framework.buttons.primary
-            href="#"
+            type="button"
             size="sm"
             @click.prevent="$dispatch('open-modal', 'add-certification')"
         >
@@ -118,7 +118,7 @@
 
                         <div class="flex gap-2">
                             <x-framework.buttons.secondary
-                                href="#"
+                                type="button"
                                 size="sm"
                                 @click.prevent="$dispatch('open-modal', 'edit-certification-{{ $certification->id }}')"
                             >

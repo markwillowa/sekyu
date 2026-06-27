@@ -22,6 +22,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
 
+            $table->foreignId('location_id')
+                ->nullable()
+                ->constrained('master_locations')
+                ->nullOnDelete();
+
             $table->string('license_number')->nullable();
 
             $table->string('email')->nullable();

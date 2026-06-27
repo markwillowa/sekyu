@@ -52,9 +52,22 @@
                     <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-80 rounded-2xl border border-slate-200 bg-white py-2 shadow-2xl z-50 overflow-hidden" style="display: none;">
                         <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center">
                             <span class="text-xs font-black uppercase tracking-widest text-slate-400">Notifications</span>
-                            @if(auth()->user()->unreadNotifications->count() > 0)
-                                <a href="#" class="text-[10px] font-bold text-blue-600 uppercase hover:underline">Mark all read</a>
-                            @endif
+                            <div class="flex items-center gap-3">
+                                @if(auth()->user()->unreadNotifications->count() > 0)
+                                    <form action="{{ route('notifications.mark-all-read') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-[10px] font-bold text-blue-600 uppercase hover:underline">Mark all read</button>
+                                    </form>
+                                @endif
+
+                                @if(auth()->user()->notifications->count() > 0)
+                                    <form action="{{ route('notifications.clear') }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-[10px] font-bold text-rose-600 uppercase hover:underline">Clear</button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
                         <div class="max-h-96 overflow-y-auto">
                             @forelse(auth()->user()->notifications->take(5) as $notification)

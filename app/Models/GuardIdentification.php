@@ -13,6 +13,7 @@ class GuardIdentification extends Model implements HasMedia
 
     protected $fillable = [
         'guard_profile_id',
+        'master_identification_type_id',
         'id_type',
         'id_number',
         'issued_at',
@@ -36,5 +37,13 @@ class GuardIdentification extends Model implements HasMedia
     {
         $this
             ->addMediaCollection('identifications');
+    }
+
+    public function identificationType(): BelongsTo
+    {
+        return $this->belongsTo(
+            MasterIdentificationType::class,
+            'master_identification_type_id'
+        );
     }
 }

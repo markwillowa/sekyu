@@ -44,12 +44,6 @@
                             </div>
                         </div>
 
-                        <a
-                            href="{{ route('applicant.profile.show', 'personal') }}"
-                            class="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
-                        >
-                            Edit Profile
-                        </a>
                     </div>
 
                     <div class="mt-8 flex flex-wrap gap-2">
@@ -135,6 +129,11 @@
                                 <div class="text-2xl font-bold text-slate-900">{{ $clearances->count() }}</div>
                                 <div class="text-sm text-slate-500">Clearances</div>
                             </div>
+
+                            <div class="rounded-2xl bg-slate-50 p-4">
+                                <div class="text-2xl font-bold text-slate-900">{{ $identifications->count() }}</div>
+                                <div class="text-sm text-slate-500">IDs</div>
+                            </div>
                         </div>
                     </section>
 
@@ -206,7 +205,7 @@
 
                     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                         <h2 class="text-xl font-bold text-slate-900">
-                            Licenses & Trainings
+                            Licenses, Trainings & Certifications
                         </h2>
 
                         <div class="mt-6 grid gap-4 sm:grid-cols-2">
@@ -234,6 +233,82 @@
                                     </p>
                                 </div>
                             @endforeach
+
+                            @foreach ($certifications as $certification)
+                                <div class="rounded-2xl border border-slate-200 p-4">
+                                    <h3 class="font-bold text-slate-900">
+                                        {{ $certification->name }}
+                                    </h3>
+
+                                    <p class="mt-1 text-sm text-slate-500">
+                                        {{ $certification->issuer ?? 'Issuer not provided' }}
+                                    </p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+
+                    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Documents & Clearances
+                        </h2>
+
+                        <div class="mt-6 space-y-4">
+                            @if($clearances->isNotEmpty())
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Clearances</h3>
+                                    <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                                        @foreach($clearances as $clearance)
+                                            <div class="rounded-2xl border border-slate-200 p-4">
+                                                <h4 class="font-bold text-slate-900">
+                                                    {{ $clearance->clearanceType?->name ?? 'Clearance' }}
+                                                </h4>
+                                                <p class="mt-1 text-sm text-slate-500">
+                                                    Expires: {{ $clearance->expires_at?->format('F d, Y') ?? 'Not provided' }}
+                                                </p>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if($identifications->isNotEmpty())
+                                <div class="pt-4">
+                                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Identifications</h3>
+                                    <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                                        @foreach($identifications as $identification)
+                                            <div class="rounded-2xl border border-slate-200 p-4">
+                                                <h4 class="font-bold text-slate-900">
+                                                    {{ $identification->identificationType?->name ?? $identification->id_type }}
+                                                </h4>
+                                                <p class="mt-1 text-sm text-slate-500">
+                                                    ID No: {{ $identification->id_number }}
+                                                </p>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if($medicals->isNotEmpty())
+                                <div class="pt-4">
+                                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Medical Records</h3>
+                                    <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                                        @foreach($medicals as $medical)
+                                            <div class="rounded-2xl border border-slate-200 p-4">
+                                                <h4 class="font-bold text-slate-900">
+                                                    {{ $medical->certificate_type }}
+                                                </h4>
+                                                @if($medical->is_fit_to_work)
+                                                    <span class="mt-2 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                        Fit to Work
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </section>
 

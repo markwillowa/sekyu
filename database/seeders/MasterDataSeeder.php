@@ -79,6 +79,7 @@ class MasterDataSeeder extends Seeder
         $this->seedLicenseTypes();
 
         $this->seedClearanceTypes();
+        $this->seedIdentificationTypes();
         $this->seedWorkLocationTypes();
         $this->seedSalaryTypes();
         $this->seedJobStatuses();
@@ -309,6 +310,43 @@ class MasterDataSeeder extends Seeder
             $code = str($name)->slug('_');
 
             DB::table('master_clearance_types')->updateOrInsert(
+                ['code' => $code],
+                [
+                    'code' => $code,
+                    'name' => $name,
+                    'description' => null,
+                    'requires_expiry' => $requiresExpiry,
+                    'sort_order' => $index + 1,
+                    'is_active' => true,
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ],
+            );
+        }
+    }
+
+    private function seedIdentificationTypes(): void
+    {
+        $identifications = [
+            ['PhilID (National ID)', false],
+            ['UMID', false],
+            ['SSS ID', false],
+            ['TIN ID', false],
+            ['PhilHealth ID', false],
+            ['Pag-IBIG ID', false],
+            ['Passport', true],
+            ['Driver\'s License', true],
+            ['PRC ID', true],
+            ['Voter\'s ID', false],
+            ['Postal ID', true],
+            ['Company ID', false],
+            ['School ID', false],
+        ];
+
+        foreach ($identifications as $index => [$name, $requiresExpiry]) {
+            $code = str($name)->slug('_');
+
+            DB::table('master_identification_types')->updateOrInsert(
                 ['code' => $code],
                 [
                     'code' => $code,

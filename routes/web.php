@@ -16,6 +16,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Public\JobController;
 use App\Http\Controllers\Public\JobApplicationController;
 use App\Http\Controllers\Public\SavedJobController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])
@@ -31,6 +32,13 @@ Route::post('/jobs/{jobPost}/apply', [JobApplicationController::class, 'store'])
 Route::post('/jobs/{jobPost}/toggle-save', [SavedJobController::class, 'toggle'])
     ->name('jobs.toggle-save')
     ->middleware('auth');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.mark-all-read');
+    Route::delete('/notifications/clear', [NotificationController::class, 'clear'])
+        ->name('notifications.clear');
+});
 
 Route::get('/login', [GuardLoginController::class, 'create'])
     ->name('login');
@@ -111,6 +119,9 @@ Route::prefix('applicant')
             Route::delete('/profile/certifications/{certification}', [ProfileController::class, 'deleteCertification'])
                 ->name('profile.delete-certification');
 
+            Route::patch('/profile/firearm-qualification', [ProfileController::class, 'updateFirearmQualification'])
+                ->name('profile.update-firearm-qualification');
+
             Route::post('/profile/work-experience', [ProfileController::class, 'storeWorkExperience'])
                 ->name('profile.store-work-experience');
 
@@ -146,6 +157,48 @@ Route::prefix('applicant')
 
             Route::delete('/profile/languages/{language}', [ProfileController::class, 'deleteLanguage'])
                 ->name('profile.delete-language');
+
+            Route::post('/profile/trainings', [ProfileController::class, 'storeTraining'])
+                ->name('profile.store-training');
+
+            Route::patch('/profile/trainings/{training}', [ProfileController::class, 'updateTraining'])
+                ->name('profile.update-training');
+
+            Route::delete('/profile/trainings/{training}', [ProfileController::class, 'deleteTraining'])
+                ->name('profile.delete-training');
+
+            Route::post('/profile/specializations', [ProfileController::class, 'storeSpecialization'])
+                ->name('profile.store-specialization');
+
+            Route::delete('/profile/specializations/{specialization}', [ProfileController::class, 'deleteSpecialization'])
+                ->name('profile.delete-specialization');
+
+            Route::post('/profile/clearances', [ProfileController::class, 'storeClearance'])
+                ->name('profile.store-clearance');
+
+            Route::patch('/profile/clearances/{clearance}', [ProfileController::class, 'updateClearance'])
+                ->name('profile.update-clearance');
+
+            Route::delete('/profile/clearances/{clearance}', [ProfileController::class, 'deleteClearance'])
+                ->name('profile.delete-clearance');
+
+            Route::post('/profile/medicals', [ProfileController::class, 'storeMedical'])
+                ->name('profile.store-medical');
+
+            Route::patch('/profile/medicals/{medical}', [ProfileController::class, 'updateMedical'])
+                ->name('profile.update-medical');
+
+            Route::delete('/profile/medicals/{medical}', [ProfileController::class, 'deleteMedical'])
+                ->name('profile.delete-medical');
+
+            Route::post('/profile/identifications', [ProfileController::class, 'storeIdentification'])
+                ->name('profile.store-identification');
+
+            Route::patch('/profile/identifications/{identification}', [ProfileController::class, 'updateIdentification'])
+                ->name('profile.update-identification');
+
+            Route::delete('/profile/identifications/{identification}', [ProfileController::class, 'deleteIdentification'])
+                ->name('profile.delete-identification');
 
             Route::get('/applications', [GuardJobApplicationController::class, 'index'])
                 ->name('applications.index');

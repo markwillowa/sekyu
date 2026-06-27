@@ -30,9 +30,6 @@
             </div>
         </div>
 
-        <x-framework.buttons.primary href="#" size="sm" class="hidden sm:inline-flex">
-            Edit Profile
-        </x-framework.buttons.primary>
     </div>
 
     <div class="mt-6 rounded-2xl bg-slate-50 p-5">

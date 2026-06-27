@@ -23,9 +23,11 @@
             'class' => 'block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm transition focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20',
         ]) }}
     >
-        <option value="">
-            {{ $placeholder }}
-        </option>
+        @if($placeholder)
+            <option value="">
+                {{ $placeholder }}
+            </option>
+        @endif
 
         @foreach($options as $value => $text)
             <option
@@ -35,6 +37,8 @@
                 {{ $text }}
             </option>
         @endforeach
+
+        {{ $slot }}
     </select>
 
     @error($name)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
 use App\Models\JobPost;
+use App\Notifications\NewJobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -45,6 +46,9 @@ class JobApplicationController extends Controller
                 'notes' => 'Application submitted.',
                 'completed_at' => now(),
             ]);
+
+            // Notify Agency Owner
+            $jobPost->agency->owner->notify(new NewJobApplication($application));
         });
 
         return back()->with('success', 'Your application has been submitted successfully!');

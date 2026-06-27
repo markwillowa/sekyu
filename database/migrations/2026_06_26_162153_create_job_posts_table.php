@@ -15,11 +15,19 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
+            $table->foreignId('workflow_template_id')->nullable()->constrained()->nullOnDelete();
+
             $table->string('title');
             $table->string('slug')->unique();
+            $table->boolean('is_featured')->default(false);
 
             $table->foreignId('employment_type_id')->nullable()->constrained('master_employment_types');
             $table->foreignId('work_location_type_id')->nullable()->constrained('master_work_location_types');
+
+            $table->foreignId('location_id')
+                ->nullable()
+                ->constrained('master_locations')
+                ->nullOnDelete();
 
             $table->string('city')->nullable();
             $table->string('province')->nullable();

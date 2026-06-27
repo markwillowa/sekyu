@@ -63,17 +63,12 @@
                     ></div>
                 </div>
 
-                <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <x-framework.buttons.primary
-                        href="{{ route('applicant.profile.show', 'personal') }}"
-                    >
-                        Edit Profile
-                    </x-framework.buttons.primary>
-
+                <div class="mt-4">
                     <x-framework.buttons.secondary
                         href="{{ route('applicant.profile.preview') }}"
+                        class="w-full"
                     >
-                        Preview
+                        Preview Profile
                     </x-framework.buttons.secondary>
                 </div>
             </x-framework.layout.card>

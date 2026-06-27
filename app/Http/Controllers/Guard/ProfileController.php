@@ -11,6 +11,15 @@ use App\Models\MasterLicenseType;
 use App\Models\MasterRelationship;
 use App\Models\MasterSkill;
 use App\Models\MasterSkillLevel;
+use App\Models\MasterTrainingType;
+use App\Models\MasterSpecialization;
+use App\Models\MasterClearanceType;
+use App\Models\MasterIdentificationType;
+use App\Models\GuardTraining;
+use App\Models\GuardSpecialization;
+use App\Models\GuardClearance;
+use App\Models\GuardMedical;
+use App\Models\GuardIdentification;
 use App\Services\Guard\ProfileCompletionService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -52,8 +61,8 @@ class ProfileController extends Controller
             'guardProfile.references',
             'guardProfile.availability',
             'guardProfile.medicals',
-            'guardProfile.clearances',
-            'guardProfile.identifications',
+            'guardProfile.clearances.clearanceType',
+            'guardProfile.identifications.identificationType',
             'guardProfile.emergencyContacts',
             'guardProfile.firearmQualification',
             'guardProfile.specializations',
@@ -101,6 +110,10 @@ class ProfileController extends Controller
             'skillLevels' => MasterSkillLevel::all(),
             'allLanguages' => MasterLanguage::all(),
             'proficiencies' => MasterLanguageProficiency::all(),
+            'trainingTypes' => MasterTrainingType::all(),
+            'allSpecializations' => MasterSpecialization::all(),
+            'clearanceTypes' => MasterClearanceType::all(),
+            'identificationTypes' => MasterIdentificationType::all(),
         ]);
     }
 
@@ -250,7 +263,13 @@ class ProfileController extends Controller
         ]);
 
         $profile = $request->user()->guardProfile;
-        $profile->certifications()->create($validated);
+        $profile->certifications()->create([
+            'name' => $validated['name'],
+            'issuing_organization' => $validated['issuer'],
+            'issued_at' => $validated['issued_at'],
+            'expires_at' => $validated['expires_at'],
+            'credential_number' => $validated['credential_id'],
+        ]);
 
         return back()->with('success', 'Certification added successfully.');
     }
@@ -265,7 +284,13 @@ class ProfileController extends Controller
             'credential_id' => 'nullable|string|max:255',
         ]);
 
-        $certification->update($validated);
+        $certification->update([
+            'name' => $validated['name'],
+            'issuing_organization' => $validated['issuer'],
+            'issued_at' => $validated['issued_at'],
+            'expires_at' => $validated['expires_at'],
+            'credential_number' => $validated['credential_id'],
+        ]);
 
         return back()->with('success', 'Certification updated successfully.');
     }
@@ -275,6 +300,26 @@ class ProfileController extends Controller
         $certification->delete();
 
         return back()->with('success', 'Certification deleted successfully.');
+    }
+
+    public function updateFirearmQualification(Request $request)
+    {
+        $validated = $request->validate([
+            'is_firearm_qualified' => 'required|boolean',
+            'firearm_type' => 'nullable|string|max:255',
+            'permit_number' => 'nullable|string|max:255',
+            'issued_at' => 'nullable|date',
+            'expires_at' => 'nullable|date',
+        ]);
+
+        $profile = $request->user()->guardProfile;
+
+        $profile->firearmQualification()->updateOrCreate(
+            ['guard_profile_id' => $profile->id],
+            $validated
+        );
+
+        return back()->with('success', 'Firearm qualification updated successfully.');
     }
 
     public function storeWorkExperience(Request $request)
@@ -425,6 +470,191 @@ class ProfileController extends Controller
         $language->delete();
 
         return back()->with('success', 'Language deleted successfully.');
+    }
+
+    public function storeTraining(Request $request)
+    {
+        $validated = $request->validate([
+            'master_training_type_id' => 'required|exists:master_training_types,id',
+            'title' => 'required|string|max:255',
+            'training_provider' => 'nullable|string|max:255',
+            'completed_at' => 'nullable|date',
+            'hours' => 'nullable|integer|min:0',
+            'certificate_number' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $request->user()->guardProfile->trainings()->create($validated);
+
+        return back()->with('success', 'Training added successfully.');
+    }
+
+    public function updateTraining(Request $request, GuardTraining $training)
+    {
+        $validated = $request->validate([
+            'master_training_type_id' => 'required|exists:master_training_types,id',
+            'title' => 'required|string|max:255',
+            'training_provider' => 'nullable|string|max:255',
+            'completed_at' => 'nullable|date',
+            'hours' => 'nullable|integer|min:0',
+            'certificate_number' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $training->update($validated);
+
+        return back()->with('success', 'Training updated successfully.');
+    }
+
+    public function deleteTraining(GuardTraining $training)
+    {
+        $training->delete();
+
+        return back()->with('success', 'Training removed successfully.');
+    }
+
+    public function storeSpecialization(Request $request)
+    {
+        $validated = $request->validate([
+            'master_specialization_id' => 'required|exists:master_specializations,id',
+            'years_of_experience' => 'nullable|integer|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        // Check if already exists
+        $exists = $request->user()->guardProfile->specializations()
+            ->where('master_specialization_id', $validated['master_specialization_id'])
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'You have already added this specialization.');
+        }
+
+        $request->user()->guardProfile->specializations()->create($validated);
+
+        return back()->with('success', 'Specialization added successfully.');
+    }
+
+    public function deleteSpecialization(GuardSpecialization $specialization)
+    {
+        $specialization->delete();
+
+        return back()->with('success', 'Specialization removed successfully.');
+    }
+
+    public function storeClearance(Request $request)
+    {
+        $validated = $request->validate([
+            'master_clearance_type_id' => 'required|exists:master_clearance_types,id',
+            'clearance_number' => 'nullable|string|max:255',
+            'issued_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after_or_equal:issued_at',
+            'issuing_office' => 'nullable|string|max:255',
+        ]);
+
+        $request->user()->guardProfile->clearances()->create($validated);
+
+        return back()->with('success', 'Clearance added successfully.');
+    }
+
+    public function updateClearance(Request $request, GuardClearance $clearance)
+    {
+        $validated = $request->validate([
+            'master_clearance_type_id' => 'required|exists:master_clearance_types,id',
+            'clearance_number' => 'nullable|string|max:255',
+            'issued_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after_or_equal:issued_at',
+            'issuing_office' => 'nullable|string|max:255',
+        ]);
+
+        $clearance->update($validated);
+
+        return back()->with('success', 'Clearance updated successfully.');
+    }
+
+    public function deleteClearance(GuardClearance $clearance)
+    {
+        $clearance->delete();
+
+        return back()->with('success', 'Clearance removed successfully.');
+    }
+
+    public function storeMedical(Request $request)
+    {
+        $validated = $request->validate([
+            'certificate_type' => 'required|string|max:255',
+            'clinic_or_hospital' => 'nullable|string|max:255',
+            'physician_name' => 'nullable|string|max:255',
+            'issued_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after_or_equal:issued_at',
+            'is_fit_to_work' => 'boolean',
+        ]);
+
+        $request->user()->guardProfile->medicals()->create($validated);
+
+        return back()->with('success', 'Medical record added successfully.');
+    }
+
+    public function updateMedical(Request $request, GuardMedical $medical)
+    {
+        $validated = $request->validate([
+            'certificate_type' => 'required|string|max:255',
+            'clinic_or_hospital' => 'nullable|string|max:255',
+            'physician_name' => 'nullable|string|max:255',
+            'issued_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after_or_equal:issued_at',
+            'is_fit_to_work' => 'boolean',
+        ]);
+
+        $medical->update($validated);
+
+        return back()->with('success', 'Medical record updated successfully.');
+    }
+
+    public function deleteMedical(GuardMedical $medical)
+    {
+        $medical->delete();
+
+        return back()->with('success', 'Medical record removed successfully.');
+    }
+
+    public function storeIdentification(Request $request)
+    {
+        $validated = $request->validate([
+            'master_identification_type_id' => 'required|exists:master_identification_types,id',
+            'id_type' => 'nullable|string|max:255',
+            'id_number' => 'required|string|max:255',
+            'issued_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after_or_equal:issued_at',
+            'issuing_authority' => 'nullable|string|max:255',
+        ]);
+
+        $request->user()->guardProfile->identifications()->create($validated);
+
+        return back()->with('success', 'Identification added successfully.');
+    }
+
+    public function updateIdentification(Request $request, GuardIdentification $identification)
+    {
+        $validated = $request->validate([
+            'master_identification_type_id' => 'required|exists:master_identification_types,id',
+            'id_type' => 'nullable|string|max:255',
+            'id_number' => 'required|string|max:255',
+            'issued_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after_or_equal:issued_at',
+            'issuing_authority' => 'nullable|string|max:255',
+        ]);
+
+        $identification->update($validated);
+
+        return back()->with('success', 'Identification updated successfully.');
+    }
+
+    public function deleteIdentification(GuardIdentification $identification)
+    {
+        $identification->delete();
+
+        return back()->with('success', 'Identification removed successfully.');
     }
 
     public function preview(Request $request): View
