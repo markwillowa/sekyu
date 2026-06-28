@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Conversation;
 use App\Models\JobApplication;
 use App\Models\Message;
+use App\Notifications\NewConversationMessage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class ConversationController extends Controller
 {
@@ -70,6 +71,8 @@ class ConversationController extends Controller
             'message' => $request->message,
         ]);
 
+        $this->sendMessageNotifications($message, $conversation, $user->id);
+
         if ($request->wantsJson() || $request->ajax()) {
             $application = $conversation->application;
             $messages = $conversation->messages()->with('sender')->oldest()->get();
@@ -80,6 +83,29 @@ class ConversationController extends Controller
         }
 
         return back()->with('success', 'Message sent.');
+    }
+
+    private function sendMessageNotifications(Message $message, Conversation $conversation, int $senderId): void
+    {
+        $message->loadMissing('sender', 'conversation.application.job.agency.proUsers');
+
+        $webRecipients = $conversation->participants()
+            ->with('user')
+            ->where('user_id', '!=', $senderId)
+            ->get()
+            ->pluck('user')
+            ->filter();
+
+        Notification::send($webRecipients, new NewConversationMessage($message));
+
+        $proRecipients = $conversation
+            ->application
+            ->job
+            ->agency
+            ->proUsers()
+            ->get();
+
+        Notification::send($proRecipients, new NewConversationMessage($message));
     }
 
     private function ensureParticipants(Conversation $conversation, JobApplication $application)

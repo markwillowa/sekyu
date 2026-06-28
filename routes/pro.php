@@ -4,6 +4,7 @@ use App\Http\Controllers\Pro\Agency\DashboardController as AgencyDashboardContro
 use App\Http\Controllers\Pro\Agency\OnboardingController;
 use App\Http\Controllers\Pro\Auth\LoginController;
 use App\Http\Controllers\Pro\Employee\DashboardController as EmployeeDashboardController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('pro')
@@ -40,6 +41,12 @@ Route::prefix('pro')
             Route::post('/logout', [LoginController::class, 'logout'])
                 ->name('logout');
 
+            Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])
+                ->name('notifications.mark-all-read');
+
+            Route::delete('/notifications/clear', [NotificationController::class, 'clear'])
+                ->name('notifications.clear');
+
         });
 
         /*
@@ -64,6 +71,15 @@ Route::prefix('pro')
 
                 Route::post('/onboarding', [OnboardingController::class, 'store'])
                     ->name('onboarding.store');
+
+                Route::get('/onboarding/{employee}/edit', [OnboardingController::class, 'edit'])
+                    ->name('onboarding.edit');
+
+                Route::put('/onboarding/{employee}', [OnboardingController::class, 'update'])
+                    ->name('onboarding.update');
+
+                Route::post('/onboarding/{employee}/reset-pin', [OnboardingController::class, 'resetPin'])
+                    ->name('onboarding.reset-pin');
 
             });
 

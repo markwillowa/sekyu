@@ -1,6 +1,13 @@
 <header
     class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur"
 >
+@php
+    $proNotifiable = auth('pro_agency')->user() ?? auth('pro_employee')->user();
+    $proUnreadCount = $proNotifiable?->unreadNotifications()->count() ?? 0;
+    $proNotifications = $proNotifiable
+        ? $proNotifiable->notifications()->latest()->limit(5)->get()
+        : collect();
+@endphp
 
     <div class="flex h-16 items-center justify-between px-4 lg:px-8">
 
@@ -68,21 +75,113 @@
         <div class="flex items-center gap-2 lg:gap-4">
 
             {{-- Notifications --}}
-            <button
-                type="button"
-                class="relative rounded-xl p-2 transition hover:bg-slate-100"
+            <div
+                x-data="{ open: false }"
+                class="relative"
             >
+                <button
+                    type="button"
+                    @click="open = ! open"
+                    class="relative rounded-xl p-2 transition hover:bg-slate-100"
+                >
 
-                <x-framework.icon
-                    name="bell"
-                    class="h-6 w-6 text-slate-600"
-                />
+                    <x-framework.icon
+                        name="bell"
+                        class="h-6 w-6 text-slate-600"
+                    />
 
-                <span
-                    class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500"
-                ></span>
+                    @if($proUnreadCount > 0)
+                        <span
+                            class="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"
+                        ></span>
+                    @endif
 
-            </button>
+                </button>
+
+                <div
+                    x-show="open"
+                    x-cloak
+                    @click.away="open = false"
+                    class="absolute right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-2xl"
+                >
+                    <div class="flex items-center justify-between border-b border-slate-100 px-4 py-2">
+                        <span class="text-xs font-black uppercase tracking-widest text-slate-400">
+                            Notifications
+                        </span>
+
+                        <div class="flex items-center gap-3">
+                            @if($proUnreadCount > 0)
+                                <form
+                                    action="{{ route('pro.notifications.mark-all-read') }}"
+                                    method="POST"
+                                >
+                                    @csrf
+
+                                    <button
+                                        type="submit"
+                                        class="text-[10px] font-bold uppercase text-blue-600 hover:underline"
+                                    >
+                                        Mark all read
+                                    </button>
+                                </form>
+                            @endif
+
+                            @if($proNotifications->isNotEmpty())
+                                <form
+                                    action="{{ route('pro.notifications.clear') }}"
+                                    method="POST"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button
+                                        type="submit"
+                                        class="text-[10px] font-bold uppercase text-rose-600 hover:underline"
+                                    >
+                                        Clear
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="max-h-96 overflow-y-auto">
+                        @forelse($proNotifications as $notification)
+                            <div
+                                @class([
+                                    'border-b border-slate-50 px-4 py-3 transition-colors last:border-0 hover:bg-slate-50',
+                                    'bg-amber-50/70' => is_null($notification->read_at),
+                                ])
+                            >
+                                <p class="text-sm font-medium leading-snug text-slate-900">
+                                    {{ $notification->data['message'] ?? 'Notification received' }}
+                                </p>
+
+                                @if(! empty($notification->data['preview']))
+                                    <p class="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-500">
+                                        {{ $notification->data['preview'] }}
+                                    </p>
+                                @endif
+
+                                <p class="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    {{ $notification->created_at->diffForHumans() }}
+                                </p>
+                            </div>
+                        @empty
+                            <div class="px-4 py-8 text-center">
+                                <x-framework.icon
+                                    name="bell-slash"
+                                    class="mx-auto mb-2 h-10 w-10 text-slate-200"
+                                />
+
+                                <p class="text-sm text-slate-400">
+                                    No notifications yet
+                                </p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
 
             {{-- Desktop User --}}
             <div class="hidden lg:block">

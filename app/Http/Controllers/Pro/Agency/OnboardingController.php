@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Pro\Agency;
 
+use App\Enums\Pro\AccountStatus;
 use App\Enums\Pro\EmploymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Pro\Agency\StoreEmployeeOnboardingRequest;
+use App\Http\Requests\Pro\Agency\UpdateEmployeeRequest;
 use App\Models\MasterSalaryType;
 use App\Models\Pro\Employee;
 use App\Models\Pro\EmployeeAccount;
@@ -41,6 +43,7 @@ class OnboardingController extends Controller
             'salaryTypes' => MasterSalaryType::where('is_active', true)
                 ->orderBy('sort_order')
                 ->pluck('name', 'id'),
+            'employmentTypeOptions' => $this->employmentTypeOptions(),
             'employmentStatusOptions' => collect(EmploymentStatus::cases())
                 ->mapWithKeys(fn (EmploymentStatus $status) => [
                     $status->value => str($status->name)->headline()->toString(),
@@ -125,6 +128,88 @@ class OnboardingController extends Controller
         return $redirect;
     }
 
+    public function edit(Employee $employee)
+    {
+        $agency = auth('pro_agency')->user()->agency;
+
+        abort_unless((int) $employee->agency_id === (int) $agency->id, 403);
+
+        return view('pro.agency.onboarding.edit', [
+            'employee' => $employee->load('account', 'guardProfile'),
+            'salaryTypes' => MasterSalaryType::where('is_active', true)
+                ->orderBy('sort_order')
+                ->pluck('name', 'id'),
+            'selectedSalaryTypeId' => MasterSalaryType::where('name', $employee->salary_type)->value('id'),
+            'employmentTypeOptions' => $this->employmentTypeOptions(),
+            'employmentStatusOptions' => collect(EmploymentStatus::cases())
+                ->mapWithKeys(fn (EmploymentStatus $status) => [
+                    $status->value => str($status->name)->headline()->toString(),
+                ]),
+        ]);
+    }
+
+    public function update(UpdateEmployeeRequest $request, Employee $employee)
+    {
+        $validated = $request->validated();
+        $isActive = $validated['is_active'] ?? false;
+        $salaryType = isset($validated['salary_type_id'])
+            ? MasterSalaryType::find($validated['salary_type_id'])?->name
+            : null;
+
+        $employee->update([
+            'employee_code' => $validated['employee_code'] ?? null,
+            'nickname' => $validated['nickname'] ?? null,
+            'position' => $validated['position'],
+            'department' => $validated['department'],
+            'employment_type' => $validated['employment_type'],
+            'employment_status' => $validated['employment_status'],
+            'current_site' => $validated['current_site'] ?? null,
+            'current_shift' => $validated['current_shift'] ?? null,
+            'basic_salary' => $validated['basic_salary'] ?? null,
+            'salary_type' => $salaryType,
+            'is_active' => $isActive,
+        ]);
+
+        $employee->account?->update([
+            'status' => $isActive
+                ? AccountStatus::Active
+                : AccountStatus::Inactive,
+        ]);
+
+        return redirect()
+            ->route('pro.agency.onboarding.index')
+            ->with('status', "{$employee->full_name} has been updated.");
+    }
+
+    public function resetPin(Employee $employee)
+    {
+        $agency = auth('pro_agency')->user()->agency;
+
+        abort_unless((int) $employee->agency_id === (int) $agency->id, 403);
+
+        $account = $employee->account;
+
+        if (! $account) {
+            return redirect()
+                ->route('pro.agency.onboarding.index')
+                ->with('error', "{$employee->full_name} does not have a portal account yet.");
+        }
+
+        $temporaryPassword = $this->generateTemporaryPassword();
+
+        $account->forceFill([
+            'password' => $temporaryPassword,
+            'force_password_change' => true,
+            'password_changed_at' => null,
+        ])->save();
+
+        return redirect()
+            ->route('pro.agency.onboarding.index')
+            ->with('status', "PIN reset for {$employee->full_name}.")
+            ->with('username', $account->username)
+            ->with('temporary_password', $temporaryPassword);
+    }
+
     private function nextEmployeeNumber(): string
     {
         $nextId = (Employee::max('id') ?? 0) + 1;
@@ -153,5 +238,15 @@ class OnboardingController extends Controller
         }
 
         return $username;
+    }
+
+    private function employmentTypeOptions(): array
+    {
+        return [
+            'full_time' => 'Full-time',
+            'part_time' => 'Part-time',
+            'contractual' => 'Contractual',
+            'project_based' => 'Project-based',
+        ];
     }
 }

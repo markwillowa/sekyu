@@ -30,7 +30,7 @@
                     </div>
 
                     <div class="mt-1">
-                        Temporary password:
+                        Temporary PIN:
                         <span class="font-mono font-semibold">{{ session('temporary_password') }}</span>
                     </div>
                 @endif
@@ -94,6 +94,7 @@
                         <x-framework.table.th>Assignment</x-framework.table.th>
                         <x-framework.table.th>Portal Access</x-framework.table.th>
                         <x-framework.table.th>Date Hired</x-framework.table.th>
+                        <x-framework.table.th class="text-right">Actions</x-framework.table.th>
                     </x-framework.table.row>
                 </x-framework.table.head>
 
@@ -125,6 +126,33 @@
 
                             <x-framework.table.td>
                                 {{ $employee->date_hired->format('M d, Y') }}
+                            </x-framework.table.td>
+
+                            <x-framework.table.td>
+                                <x-framework.table.actions>
+                                    @if($employee->account)
+                                        <form
+                                            method="POST"
+                                            action="{{ route('pro.agency.onboarding.reset-pin', $employee) }}"
+                                        >
+                                            @csrf
+
+                                            <button
+                                                type="submit"
+                                                class="inline-flex items-center justify-center rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100"
+                                            >
+                                                Reset PIN
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <x-framework.buttons.secondary
+                                        href="{{ route('pro.agency.onboarding.edit', $employee) }}"
+                                        class="px-4 py-2"
+                                    >
+                                        Edit
+                                    </x-framework.buttons.secondary>
+                                </x-framework.table.actions>
                             </x-framework.table.td>
                         </x-framework.table.row>
                     @endforeach

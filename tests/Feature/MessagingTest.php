@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Pro\AccountStatus;
+use App\Enums\Pro\UserRole;
 use App\Models\Agency;
 use App\Models\JobApplication;
 use App\Models\JobPost;
+use App\Models\Pro\AgencyUser;
 use App\Models\User;
 use App\Models\WorkflowTemplate;
+use App\Notifications\NewConversationMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Database\Seeders\RoleSeeder;
 use Tests\TestCase;
@@ -33,6 +37,15 @@ class MessagingTest extends TestCase
             'email' => 'agency@example.com',
             'phone' => '123456789',
             'address' => 'Test Address',
+        ]);
+        $proAgencyUser = AgencyUser::create([
+            'agency_id' => $agency->id,
+            'username' => 'pro-agency-admin',
+            'password' => 'password',
+            'name' => 'PRO Agency Admin',
+            'role' => UserRole::Owner->value,
+            'status' => AccountStatus::Active->value,
+            'force_password_change' => false,
         ]);
 
         // Setup Workflow
@@ -83,6 +96,19 @@ class MessagingTest extends TestCase
             'message' => 'Hello, I am interested in this position.',
         ]);
 
+        $this->assertSame(
+            1,
+            $agencyOwner->notifications()->where('type', NewConversationMessage::class)->count()
+        );
+        $this->assertSame(
+            1,
+            $proAgencyUser->notifications()->where('type', NewConversationMessage::class)->count()
+        );
+        $this->assertSame(
+            'Hello, I am interested in this position.',
+            $proAgencyUser->notifications()->first()->data['preview']
+        );
+
         // 3. Agency owner visits messages page
         $this->actingAs($agencyOwner);
         $response = $this->get(route('agency.applications.messages', $application));
@@ -99,6 +125,15 @@ class MessagingTest extends TestCase
             'sender_id' => $agencyOwner->id,
             'message' => 'Good morning. Please bring your original license.',
         ]);
+
+        $this->assertSame(
+            1,
+            $guard->notifications()->where('type', NewConversationMessage::class)->count()
+        );
+        $this->assertSame(
+            2,
+            $proAgencyUser->notifications()->where('type', NewConversationMessage::class)->count()
+        );
 
         // 5. Check if Guard can see the reply
         $this->actingAs($guard);

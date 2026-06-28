@@ -2,6 +2,7 @@
 
 namespace App\Models\Pro;
 
+use App\Enums\Pro\AccountStatus;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -34,6 +35,7 @@ class EmployeeAccount extends Authenticatable
         'password_changed_at' => 'datetime',
         'locked_until' => 'datetime',
         'force_password_change' => 'boolean',
+        'status' => AccountStatus::class,
         'password' => 'hashed',
     ];
 
