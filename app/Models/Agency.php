@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Pro\Employee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -59,6 +60,34 @@ class Agency extends Model implements HasMedia
     public function jobApplications(): HasManyThrough
     {
         return $this->hasManyThrough(JobApplication::class, JobPost::class, 'agency_id', 'job_id');
+    }
+
+    public function proUsers()
+    {
+        return $this->hasMany(\App\Models\Pro\AgencyUser::class);
+    }
+
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class);
+    }
+
+    public function acceptedApplicantProfiles()
+    {
+        return GuardProfile::query()
+            ->select('guard_profiles.*')
+            ->whereHas('user.jobApplications', function ($query) {
+                $query
+                    ->whereHas('job', fn ($jobQuery) => $jobQuery->where('agency_id', $this->id))
+                    ->whereHas('offers', function ($offerQuery) {
+                        $offerQuery
+                            ->whereNotNull('accepted_at')
+                            ->whereHas('status', fn ($statusQuery) => $statusQuery->where('code', 'accepted'));
+                    });
+            })
+            ->whereDoesntHave('employees')
+            ->orderBy('last_name')
+            ->orderBy('first_name');
     }
 
     public function getActiveJobsCountAttribute(): int

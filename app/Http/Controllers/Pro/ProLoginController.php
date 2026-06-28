@@ -15,33 +15,57 @@ class ProLoginController extends Controller
 
     public function store(Request $request)
     {
-        $credentials = $request->validate([
-            'username' => ['required'],
-            'password' => ['required'],
-        ]);
+        $type = $request->input('type', 'agency'); // 'agency' or 'employee'
 
-        if (
-            $credentials['username'] !== 'admin'
-            || $credentials['password'] !== 'admin'
-        ) {
-            return back()
-                ->withErrors([
-                    'username' => 'Invalid username or password.',
-                ])
-                ->onlyInput('username');
+        if ($type === 'employee') {
+            $credentials = $request->validate([
+                'username' => ['required'],
+                'password' => ['required'], // PIN
+            ]);
+
+            if (Auth::guard('pro_employee')->attempt($credentials, $request->boolean('remember'))) {
+                $request->session()->regenerate();
+
+                $user = Auth::guard('pro_employee')->user();
+                $user->update([
+                    'last_login_at' => now(),
+                ]);
+
+                return redirect()->intended(route('pro-2.index'));
+            }
+        } else {
+            $credentials = $request->validate([
+                'username' => ['required'],
+                'password' => ['required'], // PIN
+            ]);
+
+            if (Auth::guard('pro_agency')->attempt($credentials, $request->boolean('remember'))) {
+                $request->session()->regenerate();
+
+                $user = Auth::guard('pro_agency')->user();
+                $user->update([
+                    'last_login_at' => now(),
+                ]);
+
+                return redirect()->intended(route('pro-2.index'));
+            }
         }
 
-        session([
-            'pro_logged_in' => true,
-        ]);
-
-        return redirect()->route('pro.index');
+        return back()
+            ->withErrors([
+                'username' => 'Invalid username or password.',
+            ])
+            ->withInput($request->only('username', 'type'));
     }
 
     public function destroy(Request $request)
     {
-        $request->session()->forget('pro_logged_in');
+        Auth::guard('pro_agency')->logout();
+        Auth::guard('pro_employee')->logout();
 
-        return redirect()->route('pro.login');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('pro-2.login');
     }
 }

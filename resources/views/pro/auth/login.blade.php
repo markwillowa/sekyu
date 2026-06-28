@@ -1,153 +1,211 @@
-@extends('layouts.app')
+@extends('pro.layouts.guest')
+
+@section('title', 'SEKYU PRO')
 
 @section('content')
-    <div class="min-h-screen bg-slate-100 px-3 pt-1 pb-3 sm:px-4 sm:py-8">
-        <div class="mx-auto flex min-h-[calc(100vh-1rem)] max-w-5xl flex-col justify-center">
-            <div class="mb-3 text-center sm:mb-6">
-                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-2xl font-bold text-amber-400 shadow sm:h-16 sm:w-16 sm:text-3xl">
-                    S
-                </div>
 
-                <h1 class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:mt-4 sm:text-4xl">
-                    SEKYU PRO
-                </h1>
+    <div
+        x-data="{ mode: 'agency' }"
+        class="min-h-screen bg-slate-100"
+    >
 
-                <p class="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-sm sm:tracking-[0.25em]">
-                    Guard On Duty System
-                </p>
-            </div>
+        <div class="grid min-h-screen lg:grid-cols-2">
 
-            <div class="overflow-hidden rounded-2xl bg-white shadow-xl sm:rounded-3xl">
-                <div class="grid lg:grid-cols-2">
-                    {{-- Desktop Hero --}}
-                    <div class="hidden bg-slate-900 p-10 text-white lg:flex lg:flex-col lg:justify-between">
-                        <div>
-                            <div class="flex h-24 w-24 items-center justify-center rounded-full bg-white/10 text-5xl">
-                                👮
-                            </div>
+            {{-- Left --}}
+            <div class="hidden bg-slate-950 text-white lg:flex">
 
-                            <h2 class="mt-8 text-4xl font-bold leading-tight">
-                                Welcome back, Guard.
-                            </h2>
+                <div class="mx-auto flex w-full max-w-xl flex-col justify-center px-16">
 
-                            <p class="mt-4 text-lg leading-8 text-slate-300">
-                                Sign in first, then complete your face liveness verification before going on duty.
-                            </p>
+                    <div class="mb-10">
+
+                        <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10">
+
+                        <span class="text-3xl font-black">
+                            S
+                        </span>
+
                         </div>
 
-                        <div class="rounded-2xl bg-white/10 p-5">
-                            <p class="text-sm font-semibold text-amber-300">
-                                Reminder
-                            </p>
+                        <h1 class="text-5xl font-black tracking-tight">
+                            SEKYU PRO
+                        </h1>
 
-                            <p class="mt-2 text-sm leading-6 text-slate-300">
-                                Use your assigned account only. Ask your supervisor if you forgot your login details.
-                            </p>
-                        </div>
+                        <p class="mt-4 text-lg text-slate-300">
+                            Human Resource & Workforce Management Platform
+                        </p>
+
                     </div>
 
-                    {{-- Login Form --}}
-                    <div class="p-5 sm:p-10">
-                        <div class="text-center lg:text-left">
-                            <p class="text-xs font-bold uppercase tracking-wider text-amber-600 sm:text-sm">
-                                Guard Login
-                            </p>
+                    <div class="space-y-5">
 
-                            <h2 class="mt-1 text-2xl font-bold text-slate-900 sm:mt-2 sm:text-3xl">
-                                Sign in to continue
-                            </h2>
+                        @foreach([
+                            'Employee Management',
+                            'Attendance Monitoring',
+                            'Deployment Scheduling',
+                            'Training Records',
+                            'Equipment Tracking',
+                            'Payroll Integration',
+                        ] as $feature)
 
-                            <p class="mt-1 text-sm text-slate-500 sm:mt-2 sm:text-base">
-                                Enter your username and password.
-                            </p>
-                        </div>
+                            <div class="flex items-center gap-3">
 
-                        <form
-                            method="POST"
-                            action="{{ route('pro.login.store') }}"
-                            class="mt-6 space-y-4 sm:mt-8 sm:space-y-5"
+                                <div class="h-2.5 w-2.5 rounded-full bg-emerald-400"></div>
+
+                                <span class="text-slate-200">
+
+                                {{ $feature }}
+
+                            </span>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                    <div class="mt-16 text-sm text-slate-500">
+
+                        © {{ now()->year }} SEKYU
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {{-- Right --}}
+            <div class="flex items-center justify-center p-6 lg:p-12">
+
+                <x-framework.layout.card
+                    class="w-full max-w-md"
+                    padding="p-8"
+                >
+
+                    <div class="mb-8 text-center">
+
+                        <h2 class="text-3xl font-bold text-slate-900">
+
+                            Welcome Back
+
+                        </h2>
+
+                        <p class="mt-2 text-slate-500">
+
+                            Sign in to continue.
+
+                        </p>
+
+                    </div>
+
+                    {{-- Switch --}}
+                    <div class="mb-8 grid grid-cols-2 rounded-xl bg-slate-100 p-1">
+
+                        <button
+                            type="button"
+                            @click="mode='agency'"
+                            :class="mode==='agency'
+                            ? 'bg-slate-900 text-white shadow'
+                            : 'text-slate-600'"
+                            class="rounded-lg px-4 py-2 text-sm font-semibold transition"
                         >
-                            @csrf
 
-                            <div>
-                                <label
-                                    for="username"
-                                    class="text-base font-bold text-slate-800 sm:text-lg"
-                                >
-                                    Username
-                                </label>
+                            Agency
 
-                                <input
-                                    id="username"
-                                    type="text"
-                                    name="username"
-                                    value="{{ old('username') }}"
-                                    placeholder="Enter username"
-                                    class="mt-2 block w-full rounded-xl border-slate-300 px-4 py-3 text-base shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:px-5 sm:py-4 sm:text-lg"
-                                    required
-                                    autofocus
-                                >
+                        </button>
 
-                                @error('username')
-                                <p class="mt-2 text-sm font-semibold text-red-600">
-                                    {{ $message }}
-                                </p>
-                                @enderror
-                            </div>
+                        <button
+                            type="button"
+                            @click="mode='employee'"
+                            :class="mode==='employee'
+                            ? 'bg-slate-900 text-white shadow'
+                            : 'text-slate-600'"
+                            class="rounded-lg px-4 py-2 text-sm font-semibold transition"
+                        >
 
-                            <div>
-                                <label
-                                    for="password"
-                                    class="text-base font-bold text-slate-800 sm:text-lg"
-                                >
-                                    Password
-                                </label>
+                            Employee
 
-                                <input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    placeholder="Enter your password"
-                                    class="mt-2 block w-full rounded-xl border-slate-300 px-4 py-3 text-base shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:px-5 sm:py-4 sm:text-lg"
-                                    required
-                                >
-                            </div>
+                        </button>
 
-                            <label class="flex items-center gap-3 text-sm font-semibold text-slate-700 sm:text-base">
-                                <input
-                                    type="checkbox"
-                                    name="remember"
-                                    value="1"
-                                    class="h-5 w-5 rounded border-slate-300 text-amber-500 focus:ring-amber-500 sm:h-6 sm:w-6"
-                                >
-
-                                Remember me
-                            </label>
-
-                            <button
-                                type="submit"
-                                class="flex w-full items-center justify-center rounded-xl bg-slate-900 px-5 py-4 text-lg font-extrabold uppercase tracking-wide text-white shadow-lg transition hover:bg-slate-800 sm:px-6 sm:py-5 sm:text-xl"
-                            >
-                                Sign In
-                            </button>
-                        </form>
-
-                        <div class="mt-5 rounded-2xl bg-slate-50 p-4 sm:mt-8 sm:p-5">
-                            <p class="text-base font-bold text-slate-900 sm:text-lg">
-                                Need help?
-                            </p>
-
-                            <p class="mt-1 text-sm leading-6 text-slate-600 sm:text-base">
-                                Please contact your supervisor or system administrator.
-                            </p>
-                        </div>
                     </div>
-                </div>
+
+                    {{-- Agency Login --}}
+                    <form
+                        x-show="mode==='agency'"
+                        method="POST"
+                        action="{{ route('pro.agency.login') }}"
+                        class="space-y-5"
+                    >
+
+                        @csrf
+
+                        <x-framework.forms.input
+                            label="Username"
+                            name="username"
+                            autocomplete="username"
+                        />
+
+                        <x-framework.forms.input
+                            label="PIN"
+                            name="pin"
+                            type="password"
+                            autocomplete="current-password"
+                        />
+
+                        <x-framework.buttons.primary
+                            class="w-full"
+                        >
+                            Sign In
+                        </x-framework.buttons.primary>
+
+                    </form>
+
+                    {{-- Employee Login --}}
+                    <form
+                        x-show="mode==='employee'"
+                        method="POST"
+                        action="{{ route('pro.employee.login') }}"
+                        class="space-y-5"
+                    >
+
+                        @csrf
+
+                        <x-framework.forms.input
+                            label="Employee Number"
+                            name="employee_no"
+                        />
+
+                        <x-framework.forms.input
+                            label="PIN"
+                            name="pin"
+                            type="password"
+                        />
+
+                        <x-framework.buttons.primary
+                            class="w-full"
+                        >
+                            Sign In
+                        </x-framework.buttons.primary>
+
+                    </form>
+
+                    <div class="mt-8 text-center text-sm text-slate-500">
+
+                        Powered by
+
+                        <span class="font-semibold text-slate-900">
+
+                        SEKYU
+
+                    </span>
+
+                    </div>
+
+                </x-framework.layout.card>
+
             </div>
 
-            <p class="mt-4 text-center text-xs text-slate-500 sm:mt-6 sm:text-sm">
-                SEKYU PRO Guard On Duty System
-            </p>
         </div>
+
     </div>
+
 @endsection

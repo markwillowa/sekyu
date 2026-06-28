@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Agency;
 
 use App\Http\Controllers\Controller;
+use App\Models\MasterEmploymentType;
 use App\Models\MasterInterviewType;
+use App\Models\MasterLocation;
 use App\Models\MasterSalaryType;
 use App\Models\JobApplication;
 use App\Models\GuardProfile;
@@ -83,7 +85,9 @@ class JobApplicationController extends Controller
 
         $application->load([
             'job.workflowTemplate.steps',
-            'jobOffer',
+            'jobOffer.employmentType',
+            'jobOffer.location',
+            'jobOffer.status',
             'applicant.guardProfile' => function ($query) {
                 $query->with([
                     'workExperiences',
@@ -107,8 +111,10 @@ class JobApplicationController extends Controller
         $profileCompletion = $completionService->calculate($application->applicant->guardProfile);
         $interviewTypes = MasterInterviewType::where('is_active', true)->orderBy('sort_order')->get();
         $salaryTypes = MasterSalaryType::where('is_active', true)->orderBy('sort_order')->get();
+        $employmentTypes = MasterEmploymentType::where('is_active', true)->orderBy('sort_order')->pluck('name', 'id');
+        $locations = MasterLocation::where('is_active', true)->orderBy('sort_order')->pluck('name', 'id');
 
-        return view('agency.applications.show', compact('application', 'workflowSteps', 'profileCompletion', 'interviewTypes', 'salaryTypes'));
+        return view('agency.applications.show', compact('application', 'workflowSteps', 'profileCompletion', 'interviewTypes', 'salaryTypes', 'employmentTypes', 'locations'));
     }
 
     public function move(Request $request, JobApplication $application)

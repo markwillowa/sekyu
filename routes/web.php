@@ -245,7 +245,7 @@ Route::prefix('applicant')
 */
 
 Route::prefix('pro')
-    ->name('pro.')
+    ->name('pro')
     ->group(function () {
         Route::get('/login', [ProLoginController::class, 'create'])
             ->name('login');

@@ -20,7 +20,7 @@ class JobOfferController extends Controller
             return back()->with('error', 'Only sent offers can be accepted.');
         }
 
-        $acceptedStatus = MasterJobOfferStatus::where('code', 'accepted')->first();
+        $acceptedStatus = $this->status('accepted', 'Accepted', 3);
 
         $offer->update([
             'status_id' => $acceptedStatus->id,
@@ -42,7 +42,7 @@ class JobOfferController extends Controller
             return back()->with('error', 'Only sent offers can be declined.');
         }
 
-        $declinedStatus = MasterJobOfferStatus::where('code', 'declined')->first();
+        $declinedStatus = $this->status('declined', 'Declined', 4);
 
         $offer->update([
             'status_id' => $declinedStatus->id,
@@ -67,5 +67,17 @@ class JobOfferController extends Controller
         }
 
         return $media;
+    }
+
+    private function status(string $code, string $name, int $sortOrder): MasterJobOfferStatus
+    {
+        return MasterJobOfferStatus::firstOrCreate(
+            ['code' => $code],
+            [
+                'name' => $name,
+                'sort_order' => $sortOrder,
+                'is_active' => true,
+            ]
+        );
     }
 }

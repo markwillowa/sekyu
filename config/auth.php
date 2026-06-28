@@ -42,6 +42,16 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'pro_agency' => [
+            'driver' => 'session',
+            'provider' => 'pro_agency_users',
+        ],
+
+        'pro_employee' => [
+            'driver' => 'session',
+            'provider' => 'pro_employee_accounts',
+        ],
     ],
 
     /*
@@ -67,10 +77,15 @@ return [
             'model' => env('AUTH_MODEL', User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'pro_agency_users' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\Pro\AgencyUser::class,
+        ],
+
+        'pro_employee_accounts' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\Pro\EmployeeAccount::class,
+        ],
     ],
 
     /*

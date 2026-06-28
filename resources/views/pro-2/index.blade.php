@@ -105,13 +105,13 @@
                     <form
                         id="auto-logout-form"
                         method="POST"
-                        action="{{ route('pro.logout') }}"
+                        action="{{ route('pro-2.logout') }}"
                         class="hidden"
                     >
                         @csrf
                     </form>
 
-                    <form method="POST" action="{{ route('pro.logout') }}" class="mt-4 sm:mt-6">
+                    <form method="POST" action="{{ route('pro-2.logout') }}" class="mt-4 sm:mt-6">
                         @csrf
 
                         <button

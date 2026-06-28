@@ -24,7 +24,16 @@ class JobApplicationController extends Controller
             abort(403);
         }
 
-        $application->load(['job.agency', 'currentStep', 'histories.step', 'job.workflowTemplate.steps', 'jobOffer']);
+        $application->load([
+            'job.agency',
+            'job.location',
+            'currentStep',
+            'histories.step',
+            'job.workflowTemplate.steps',
+            'jobOffer.employmentType',
+            'jobOffer.location',
+            'jobOffer.status',
+        ]);
 
         return view('guard.applications.show', compact('application'));
     }

@@ -1,11 +1,11 @@
 <x-framework.feedback.modal
     name="login-modal"
-    :show="$errors->any() || session('open_login_modal')"
+    :show="session('open_login_modal') || in_array(old('account_type'), ['agency', 'applicant', 'guard'], true)"
     maxWidth="lg"
     title="Welcome Back"
     description="Sign in to continue to your dashboard"
 >
-    <div x-data="{ accountType: '{{ old('account_type', 'applicant') }}' }">
+    <div x-data="{ accountType: '{{ old('account_type') === 'applicant' ? 'guard' : old('account_type', 'guard') }}' }">
         <!-- Switcher -->
         <div class="grid grid-cols-2 gap-4 mb-6">
             <button
@@ -58,10 +58,10 @@
                         required
                         placeholder="Enter your email"
                         class="w-full rounded-xl border-slate-200 px-4 py-2.5 focus:border-amber-500 focus:ring-amber-500 transition-all bg-slate-50 focus:bg-white text-sm"
-                        value="{{ old('email') && old('account_type') === 'applicant' ? old('email') : '' }}"
+                        value="{{ old('email') && in_array(old('account_type'), ['applicant', 'guard'], true) ? old('email') : '' }}"
                     >
                     @error('email')
-                        @if(old('account_type') === 'applicant' || !old('account_type'))
+                        @if(in_array(old('account_type'), ['applicant', 'guard'], true) || !old('account_type'))
                             <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
                         @endif
                     @enderror

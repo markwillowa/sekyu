@@ -33,7 +33,7 @@
                                 </div>
                                 <div>
                                     <div class="text-slate-900 font-bold">{{ $application->job->agency->name }}</div>
-                                    <div class="text-sm text-slate-500">{{ $application->job->location_name ?? 'Location N/A' }}</div>
+                                    <div class="text-sm text-slate-500">{{ $application->job->location?->name ?? 'Location N/A' }}</div>
                                 </div>
                             </div>
                             <div class="pt-4 border-t border-slate-100">
@@ -53,17 +53,17 @@
                     </div>
 
                     {{-- Job Offer Card --}}
-                    @if($application->jobOffer && $application->jobOffer->status !== 'Draft')
+                    @if($application->jobOffer && $application->jobOffer->status?->code !== 'draft')
                         <div class="mt-6 bg-white p-6 rounded-2xl border border-blue-200 shadow-sm ring-1 ring-blue-50">
                             <div class="flex justify-between items-center mb-6">
                                 <h3 class="text-lg font-bold text-slate-900">Job Offer</h3>
-                                <x-framework.feedback.badge :color="match($application->jobOffer->status) {
-                                    'Sent' => 'blue',
-                                    'Accepted' => 'green',
-                                    'Declined' => 'red',
+                                <x-framework.feedback.badge :color="match($application->jobOffer->status?->code) {
+                                    'sent' => 'blue',
+                                    'accepted' => 'green',
+                                    'declined' => 'red',
                                     default => 'slate'
                                 }">
-                                    {{ $application->jobOffer->status }}
+                                    {{ $application->jobOffer->status?->name ?? 'Unknown' }}
                                 </x-framework.feedback.badge>
                             </div>
 
@@ -84,11 +84,11 @@
                                 <div class="grid grid-cols-1 gap-4 text-sm">
                                     <div>
                                         <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Employment Type</span>
-                                        <span class="text-slate-900 font-medium">{{ $application->jobOffer->employment_type }}</span>
+                                        <span class="text-slate-900 font-medium">{{ $application->jobOffer->employmentType?->name ?? 'Not set' }}</span>
                                     </div>
                                     <div>
                                         <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Location</span>
-                                        <span class="text-slate-900 font-medium">{{ $application->jobOffer->location }}</span>
+                                        <span class="text-slate-900 font-medium">{{ $application->jobOffer->location?->name ?? 'Not set' }}</span>
                                     </div>
                                 </div>
 
@@ -100,7 +100,7 @@
                                 @endif
 
                                 <div class="pt-6 border-t border-slate-100 space-y-3">
-                                    @if($application->jobOffer->status === 'Sent')
+                                    @if($application->jobOffer->status?->code === 'sent')
                                         <div class="grid grid-cols-2 gap-3">
                                             <form action="{{ route('applicant.offers.accept', $application->jobOffer) }}" method="POST">
                                                 @csrf
@@ -137,10 +137,12 @@
                         <div class="flex justify-between items-center mb-8">
                             <h3 class="text-xl font-bold text-slate-900">Application Progress</h3>
                             @php
-                                $allSteps = $application->job->workflowTemplate->steps;
+                                $allSteps = $application->job->workflowTemplate?->steps ?? collect();
                                 $currentIndex = $allSteps->search(fn($s) => $s->id === $application->current_workflow_step_id);
                                 $totalSteps = count($allSteps);
-                                $progressPercent = $totalSteps > 0 ? (($currentIndex + 1) / $totalSteps) * 100 : 0;
+                                $progressPercent = $totalSteps > 0 && $currentIndex !== false
+                                    ? (($currentIndex + 1) / $totalSteps) * 100
+                                    : 0;
                             @endphp
                             <div class="text-right">
                                 <span class="text-sm font-bold text-blue-600">{{ round($progressPercent) }}% Progress</span>
@@ -152,62 +154,68 @@
                         </div>
 
                         <nav aria-label="Progress">
-                            <ol role="list" class="overflow-hidden">
-                                @foreach($allSteps as $index => $step)
-                                    @php
-                                        $isCurrent = $application->current_workflow_step_id === $step->id;
-                                        $isCompleted = $index < $currentIndex;
-                                        $isUpcoming = $index > $currentIndex;
-                                    @endphp
-                                    <li @class(['relative', 'pb-10' => !$loop->last])>
-                                        @if(!$loop->last)
-                                            <div @class([
-                                                'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5',
-                                                'bg-blue-600' => $isCompleted || $isCurrent,
-                                                'bg-slate-200' => $isUpcoming
-                                            ]) aria-hidden="true"></div>
-                                        @endif
+                            @if($allSteps->isEmpty())
+                                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                                    Application progress will appear once the agency configures its workflow.
+                                </div>
+                            @else
+                                <ol role="list" class="overflow-hidden">
+                                    @foreach($allSteps as $index => $step)
+                                        @php
+                                            $isCurrent = $application->current_workflow_step_id === $step->id;
+                                            $isCompleted = $currentIndex !== false && $index < $currentIndex;
+                                            $isUpcoming = $currentIndex === false || $index > $currentIndex;
+                                        @endphp
+                                        <li @class(['relative', 'pb-10' => !$loop->last])>
+                                            @if(!$loop->last)
+                                                <div @class([
+                                                    'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5',
+                                                    'bg-blue-600' => $isCompleted || $isCurrent,
+                                                    'bg-slate-200' => $isUpcoming
+                                                ]) aria-hidden="true"></div>
+                                            @endif
 
-                                        <div class="group relative flex items-start">
-                                            <span class="flex h-9 items-center">
-                                                @if($isCompleted)
-                                                    <span class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 ring-4 ring-blue-50">
-                                                        <x-framework.icon name="check" class="h-4 w-4 text-white" />
-                                                    </span>
-                                                @elseif($isCurrent)
-                                                    <span class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-blue-600 bg-white ring-4 ring-blue-50">
-                                                        <span class="h-2.5 w-2.5 rounded-full bg-blue-600 animate-pulse"></span>
-                                                    </span>
-                                                @else
-                                                    <span class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-slate-300 bg-white">
-                                                        <span class="h-2 w-2 rounded-full bg-transparent"></span>
-                                                    </span>
-                                                @endif
-                                            </span>
-                                            <span class="ml-4 flex min-w-0 flex-col">
-                                                <span @class([
-                                                    'text-sm font-bold tracking-wide uppercase',
-                                                    'text-blue-600' => $isCurrent,
-                                                    'text-slate-900' => $isCompleted,
-                                                    'text-slate-400' => $isUpcoming
-                                                ])>
-                                                    {{ $step->name }}
+                                            <div class="group relative flex items-start">
+                                                <span class="flex h-9 items-center">
+                                                    @if($isCompleted)
+                                                        <span class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 ring-4 ring-blue-50">
+                                                            <x-framework.icon name="check" class="h-4 w-4 text-white" />
+                                                        </span>
+                                                    @elseif($isCurrent)
+                                                        <span class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-blue-600 bg-white ring-4 ring-blue-50">
+                                                            <span class="h-2.5 w-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+                                                        </span>
+                                                    @else
+                                                        <span class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-slate-300 bg-white">
+                                                            <span class="h-2 w-2 rounded-full bg-transparent"></span>
+                                                        </span>
+                                                    @endif
                                                 </span>
-                                                @if($isCurrent)
-                                                    <span class="text-sm text-slate-500 mt-1">Your application is currently being reviewed at this stage.</span>
-                                                @elseif($isCompleted)
-                                                     @php
-                                                        $history = $application->histories->where('workflow_step_id', $step->id)->last();
-                                                     @endphp
-                                                     <span class="text-xs text-slate-400 mt-1">Passed on {{ $history?->completed_at->format('M d, Y') }}</span>
-                                                @else
-                                                     <span class="text-xs text-slate-300 mt-1">Pending previous stages</span>
-                                                @endif
-                                            </span>
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ol>
+                                                <span class="ml-4 flex min-w-0 flex-col">
+                                                    <span @class([
+                                                        'text-sm font-bold tracking-wide uppercase',
+                                                        'text-blue-600' => $isCurrent,
+                                                        'text-slate-900' => $isCompleted,
+                                                        'text-slate-400' => $isUpcoming
+                                                    ])>
+                                                        {{ $step->name }}
+                                                    </span>
+                                                    @if($isCurrent)
+                                                        <span class="text-sm text-slate-500 mt-1">Your application is currently being reviewed at this stage.</span>
+                                                    @elseif($isCompleted)
+                                                         @php
+                                                            $history = $application->histories->where('workflow_step_id', $step->id)->last();
+                                                         @endphp
+                                                         <span class="text-xs text-slate-400 mt-1">Passed on {{ $history?->completed_at->format('M d, Y') }}</span>
+                                                    @else
+                                                         <span class="text-xs text-slate-300 mt-1">Pending previous stages</span>
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ol>
+                            @endif
                         </nav>
                     </div>
                 </div>

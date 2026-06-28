@@ -139,6 +139,21 @@ class GuardProfile extends Model implements HasMedia
         return $this->hasMany(GuardSpecialization::class);
     }
 
+    public function employees(): HasMany
+    {
+        return $this->hasMany(\App\Models\Pro\Employee::class);
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return collect([
+            $this->first_name,
+            $this->middle_name,
+            $this->last_name,
+            $this->suffix,
+        ])->filter()->implode(' ');
+    }
+
     public function registerMediaCollections(): void
     {
         $this

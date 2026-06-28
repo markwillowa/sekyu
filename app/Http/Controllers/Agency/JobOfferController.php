@@ -8,7 +8,7 @@ use App\Models\JobOffer;
 use App\Models\MasterJobOfferStatus;
 use App\Notifications\JobOfferSent;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class JobOfferController extends Controller
@@ -20,7 +20,7 @@ class JobOfferController extends Controller
             abort(403);
         }
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'salary' => 'required|numeric',
             'employment_type_id' => 'required|exists:master_employment_types,id',
             'start_date' => 'required|date',
@@ -29,8 +29,15 @@ class JobOfferController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('trigger_modal', 'create-job-offer');
+        }
+
         $offerNumber = 'OFF-' . strtoupper(Str::random(8));
-        $draftStatus = MasterJobOfferStatus::where('code', 'draft')->first();
+        $draftStatus = $this->status('draft', 'Draft', 1);
 
         $offer = JobOffer::create([
             'job_application_id' => $application->id,
@@ -54,7 +61,7 @@ class JobOfferController extends Controller
             abort(403);
         }
 
-        $sentStatus = MasterJobOfferStatus::where('code', 'sent')->first();
+        $sentStatus = $this->status('sent', 'Sent', 2);
         $offer->update(['status_id' => $sentStatus->id]);
 
         $offer->application->applicant->notify(new JobOfferSent($offer));
@@ -77,5 +84,17 @@ class JobOfferController extends Controller
         $offer->addMediaFromRequest('offer_letter')->toMediaCollection('offer_letter');
 
         return back()->with('success', 'Offer letter PDF uploaded successfully.');
+    }
+
+    private function status(string $code, string $name, int $sortOrder): MasterJobOfferStatus
+    {
+        return MasterJobOfferStatus::firstOrCreate(
+            ['code' => $code],
+            [
+                'name' => $name,
+                'sort_order' => $sortOrder,
+                'is_active' => true,
+            ]
+        );
     }
 }

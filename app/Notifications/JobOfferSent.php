@@ -44,7 +44,7 @@ class JobOfferSent extends Notification
             ->line('You have received a new job offer from ' . $this->application->job->agency->name . '.')
             ->line('Salary: ' . number_format($this->offer->salary, 2))
             ->line('Start Date: ' . $this->offer->start_date->format('M d, Y'))
-            ->action('View Offer', route('guard.applications.show', $this->application))
+            ->action('View Offer', route('applicant.applications.show', $this->application))
             ->line('Please review the offer and accept or decline it through the portal.');
     }
 

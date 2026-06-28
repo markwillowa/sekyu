@@ -254,14 +254,14 @@
                                             <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Offer Number</div>
                                             <div class="text-lg font-bold text-slate-900">{{ $application->jobOffer->offer_number }}</div>
                                         </div>
-                                        <x-framework.feedback.badge :color="match($application->jobOffer->status) {
-                                            'Draft' => 'gray',
-                                            'Sent' => 'blue',
-                                            'Accepted' => 'green',
-                                            'Declined' => 'red',
+                                        <x-framework.feedback.badge :color="match($application->jobOffer->status?->code) {
+                                            'draft' => 'gray',
+                                            'sent' => 'blue',
+                                            'accepted' => 'green',
+                                            'declined' => 'red',
                                             default => 'slate'
                                         }">
-                                            {{ $application->jobOffer->status }}
+                                            {{ $application->jobOffer->status?->name ?? 'Unknown' }}
                                         </x-framework.feedback.badge>
                                     </div>
 
@@ -276,11 +276,11 @@
                                         </div>
                                         <div>
                                             <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Employment Type</span>
-                                            <span class="text-slate-900 font-bold">{{ $application->jobOffer->employment_type }}</span>
+                                            <span class="text-slate-900 font-bold">{{ $application->jobOffer->employmentType?->name ?? 'Not set' }}</span>
                                         </div>
                                         <div class="col-span-2">
                                             <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Location</span>
-                                            <span class="text-slate-900 font-bold">{{ $application->jobOffer->location }}</span>
+                                            <span class="text-slate-900 font-bold">{{ $application->jobOffer->location?->name ?? 'Not set' }}</span>
                                         </div>
                                     </div>
 
@@ -295,7 +295,7 @@
                                         <div>
                                             <h4 class="text-sm font-bold text-slate-900 mb-4">Actions</h4>
                                             <div class="flex items-center gap-4">
-                                                @if($application->jobOffer->status === 'Draft')
+                                                @if($application->jobOffer->status?->code === 'draft')
                                                     <form action="{{ route('agency.offers.send', $application->jobOffer) }}" method="POST">
                                                         @csrf
                                                         <x-framework.buttons.primary type="submit" size="sm">
@@ -574,8 +574,8 @@
 
                 <x-framework.forms.select
                     label="Employment Type"
-                    name="employment_type"
-                    :options="['Full-time' => 'Full-time', 'Part-time' => 'Part-time', 'Contract' => 'Contract']"
+                    name="employment_type_id"
+                    :options="$employmentTypes"
                     required
                 />
             </div>
@@ -588,10 +588,11 @@
                     required
                 />
 
-                <x-framework.forms.input
+                <x-framework.forms.select
                     label="Location"
-                    name="location"
-                    :value="$application->job->location_name"
+                    name="location_id"
+                    :options="$locations"
+                    :selected="$application->job->location_id"
                     required
                 />
             </div>
