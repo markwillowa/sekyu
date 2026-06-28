@@ -7,7 +7,9 @@ use App\Http\Controllers\Agency\WorkflowTemplateController;
 use App\Http\Controllers\Agency\WorkflowTemplateStepController;
 use App\Http\Controllers\InterviewCalendarController;
 use App\Http\Controllers\Agency\JobApplicationController as AgencyJobApplicationController;
+use App\Http\Controllers\Agency\JobOfferController as AgencyJobOfferController;
 use App\Http\Controllers\Guard\JobApplicationController as GuardJobApplicationController;
+use App\Http\Controllers\Guard\JobOfferController as GuardJobOfferController;
 use App\Http\Controllers\Guard\Auth\GuardLoginController;
 use App\Http\Controllers\Guard\Auth\GuardRegisterController;
 use App\Http\Controllers\Guard\ProfileController;
@@ -223,6 +225,15 @@ Route::prefix('applicant')
 
             Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage'])
                 ->name('conversations.messages.send');
+
+            Route::post('/offers/{offer}/accept', [GuardJobOfferController::class, 'accept'])
+                ->name('offers.accept');
+
+            Route::post('/offers/{offer}/decline', [GuardJobOfferController::class, 'decline'])
+                ->name('offers.decline');
+
+            Route::get('/offers/{offer}/download', [GuardJobOfferController::class, 'downloadPdf'])
+                ->name('offers.download');
         });
     });
 
@@ -344,6 +355,15 @@ Route::prefix('agency')
 
             Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage'])
                 ->name('conversations.messages.send');
+
+            Route::post('/applications/{application}/offers', [AgencyJobOfferController::class, 'store'])
+                ->name('applications.offers.store');
+
+            Route::post('/offers/{offer}/send', [AgencyJobOfferController::class, 'send'])
+                ->name('offers.send');
+
+            Route::post('/offers/{offer}/upload-pdf', [AgencyJobOfferController::class, 'uploadPdf'])
+                ->name('offers.upload-pdf');
 
             Route::get('/guards/{guardProfile}', [AgencyJobApplicationController::class, 'showGuardProfile'])
                 ->name('guard-profile.show');

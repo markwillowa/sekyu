@@ -165,16 +165,41 @@
                     </div>
 
                     {{-- Applicant Experience & Documents --}}
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" x-data="{ activeTab: 'experience' }">
                         <div class="border-b border-slate-100 mb-6 pb-2">
                             <nav class="flex space-x-8" aria-label="Tabs">
-                                <button class="border-blue-500 text-blue-600 border-b-2 py-4 px-1 text-sm font-bold">Experience</button>
-                                <button class="border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 border-b-2 py-4 px-1 text-sm font-medium">Certificates</button>
-                                <button class="border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 border-b-2 py-4 px-1 text-sm font-medium">Documents</button>
+                                <button
+                                    @click="activeTab = 'experience'"
+                                    :class="activeTab === 'experience' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                                    class="border-b-2 py-4 px-1 text-sm font-bold"
+                                >
+                                    Experience
+                                </button>
+                                <button
+                                    @click="activeTab = 'certificates'"
+                                    :class="activeTab === 'certificates' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                                    class="border-b-2 py-4 px-1 text-sm font-medium"
+                                >
+                                    Certificates
+                                </button>
+                                <button
+                                    @click="activeTab = 'documents'"
+                                    :class="activeTab === 'documents' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                                    class="border-b-2 py-4 px-1 text-sm font-medium"
+                                >
+                                    Documents
+                                </button>
+                                <button
+                                    @click="activeTab = 'job-offer'"
+                                    :class="activeTab === 'job-offer' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                                    class="border-b-2 py-4 px-1 text-sm font-medium"
+                                >
+                                    Job Offer
+                                </button>
                             </nav>
                         </div>
 
-                        <div class="space-y-6">
+                        <div class="space-y-6" x-show="activeTab === 'experience'">
                             @if($application->applicant->guardProfile)
                                 @forelse($application->applicant->guardProfile->workExperiences as $exp)
                                     <div class="flex space-x-4">
@@ -196,14 +221,125 @@
                                 <p class="text-sm text-slate-500 italic">Profile not yet created.</p>
                             @endif
                         </div>
-                    </div>
 
-                    {{-- Certificates & Documents fallbacks --}}
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hidden" id="certificates-tab">
-                        <p class="text-sm text-slate-500 italic">No certificates found.</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hidden" id="documents-tab">
-                        <p class="text-sm text-slate-500 italic">No documents found.</p>
+                        {{-- Certificates & Documents fallbacks --}}
+                        <div x-show="activeTab === 'certificates'">
+                            <p class="text-sm text-slate-500 italic">No certificates found.</p>
+                        </div>
+                        <div x-show="activeTab === 'documents'">
+                            <p class="text-sm text-slate-500 italic">No documents found.</p>
+                        </div>
+
+                        {{-- Job Offer Tab --}}
+                        <div x-show="activeTab === 'job-offer'">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-bold text-slate-900">Job Offer</h3>
+                                @if(!$application->jobOffer)
+                                    <x-framework.buttons.primary size="sm" x-on:click="$dispatch('open-modal', 'create-job-offer')">
+                                        Generate Offer Letter
+                                    </x-framework.buttons.primary>
+                                @endif
+                            </div>
+
+                            @if($application->jobOffer)
+                                <div class="p-6 rounded-xl border border-slate-100 bg-slate-50">
+                                    <div class="flex justify-between items-start mb-6">
+                                        <div>
+                                            <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Offer Number</div>
+                                            <div class="text-lg font-bold text-slate-900">{{ $application->jobOffer->offer_number }}</div>
+                                        </div>
+                                        <x-framework.feedback.badge :color="match($application->jobOffer->status) {
+                                            'Draft' => 'gray',
+                                            'Sent' => 'blue',
+                                            'Accepted' => 'green',
+                                            'Declined' => 'red',
+                                            default => 'slate'
+                                        }">
+                                            {{ $application->jobOffer->status }}
+                                        </x-framework.feedback.badge>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-6">
+                                        <div>
+                                            <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Monthly Salary</span>
+                                            <span class="text-slate-900 font-bold">₱{{ number_format($application->jobOffer->salary, 2) }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Start Date</span>
+                                            <span class="text-slate-900 font-bold">{{ $application->jobOffer->start_date->format('M d, Y') }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Employment Type</span>
+                                            <span class="text-slate-900 font-bold">{{ $application->jobOffer->employment_type }}</span>
+                                        </div>
+                                        <div class="col-span-2">
+                                            <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Location</span>
+                                            <span class="text-slate-900 font-bold">{{ $application->jobOffer->location }}</span>
+                                        </div>
+                                    </div>
+
+                                    @if($application->jobOffer->benefits)
+                                        <div class="mb-6">
+                                            <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Benefits</span>
+                                            <p class="text-sm text-slate-700 whitespace-pre-line">{{ $application->jobOffer->benefits }}</p>
+                                        </div>
+                                    @endif
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-200">
+                                        <div>
+                                            <h4 class="text-sm font-bold text-slate-900 mb-4">Actions</h4>
+                                            <div class="flex items-center gap-4">
+                                                @if($application->jobOffer->status === 'Draft')
+                                                    <form action="{{ route('agency.offers.send', $application->jobOffer) }}" method="POST">
+                                                        @csrf
+                                                        <x-framework.buttons.primary type="submit" size="sm">
+                                                            Send to Applicant
+                                                        </x-framework.buttons.primary>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h4 class="text-sm font-bold text-slate-900 mb-4">Offer Letter PDF</h4>
+                                            @if($application->jobOffer->hasMedia('offer_letter'))
+                                                <div class="flex items-center gap-4 mb-4">
+                                                    <div class="flex items-center p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                                        <x-framework.icon name="document-text" class="h-6 w-6 text-slate-400 mr-3" />
+                                                        <div class="flex flex-col">
+                                                            <span class="text-xs font-bold text-slate-700">{{ $application->jobOffer->getFirstMedia('offer_letter')->file_name }}</span>
+                                                            <span class="text-[10px] text-slate-400">{{ $application->jobOffer->getFirstMedia('offer_letter')->human_readable_size }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+
+                                            <form action="{{ route('agency.offers.upload-pdf', $application->jobOffer) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                                                @csrf
+                                                <div>
+                                                    <input type="file" name="offer_letter" accept="application/pdf" class="block w-full text-sm text-slate-500
+                                                        file:mr-4 file:py-2 file:px-4
+                                                        file:rounded-full file:border-0
+                                                        file:text-xs file:font-semibold
+                                                        file:bg-blue-50 file:text-blue-700
+                                                        hover:file:bg-blue-100
+                                                    "/>
+                                                    <x-framework.forms.error name="offer_letter" />
+                                                </div>
+                                                <x-framework.buttons.secondary type="submit" size="sm">
+                                                    {{ $application->jobOffer->hasMedia('offer_letter') ? 'Replace PDF' : 'Upload PDF' }}
+                                                </x-framework.buttons.secondary>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                    <x-framework.icon name="document-text" class="h-10 w-10 text-slate-200 mx-auto mb-2" />
+                                    <p class="text-sm text-slate-500 italic">No offer letter has been generated for this applicant yet.</p>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -412,6 +548,68 @@
                 </x-framework.buttons.secondary>
                 <x-framework.buttons.primary type="submit">
                     Save Interview
+                </x-framework.buttons.primary>
+            </div>
+        </form>
+    </x-framework.feedback.modal>
+
+    <x-framework.feedback.modal name="create-job-offer" title="Generate Job Offer">
+        <form action="{{ route('agency.applications.offers.store', $application) }}" method="POST" class="space-y-6">
+            @csrf
+            <div class="grid grid-cols-2 gap-4">
+                <x-framework.forms.input
+                    label="Monthly Salary"
+                    name="salary"
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g. 25000"
+                    required
+                />
+
+                <x-framework.forms.select
+                    label="Employment Type"
+                    name="employment_type"
+                    :options="['Full-time' => 'Full-time', 'Part-time' => 'Part-time', 'Contract' => 'Contract']"
+                    required
+                />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <x-framework.forms.input
+                    label="Start Date"
+                    name="start_date"
+                    type="date"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="Location"
+                    name="location"
+                    :value="$application->job->location_name"
+                    required
+                />
+            </div>
+
+            <x-framework.forms.textarea
+                label="Benefits"
+                name="benefits"
+                placeholder="List benefits here..."
+                rows="3"
+            />
+
+            <x-framework.forms.textarea
+                label="Remarks"
+                name="remarks"
+                placeholder="Internal remarks (optional)..."
+                rows="2"
+            />
+
+            <div class="flex justify-end gap-3 pt-4">
+                <x-framework.buttons.secondary type="button" x-on:click="$dispatch('close-modal', 'create-job-offer')">
+                    Cancel
+                </x-framework.buttons.secondary>
+                <x-framework.buttons.primary type="submit">
+                    Generate Draft
                 </x-framework.buttons.primary>
             </div>
         </form>

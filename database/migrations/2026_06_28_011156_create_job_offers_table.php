@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('job_offers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('job_application_id')->constrained()->onDelete('cascade');
+            $table->string('offer_number')->unique();
+            $table->decimal('salary', 12, 2);
+            $table->string('employment_type'); // could be foreignId to master_employment_types
+            $table->date('start_date');
+            $table->string('location');
+            $table->text('benefits')->nullable();
+            $table->text('remarks')->nullable();
+            $table->string('status')->default('Draft'); // Draft, Sent, Accepted, Declined, Expired
+            $table->timestamp('accepted_at')->nullable();
+            $table->timestamp('declined_at')->nullable();
+            $table->string('pdf_path')->nullable();
             $table->timestamps();
         });
     }

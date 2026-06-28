@@ -55,4 +55,19 @@ class JobApplication extends Model
     {
         return $this->hasOne(Conversation::class);
     }
+
+    public function offers(): HasMany
+    {
+        return $this->hasMany(JobOffer::class);
+    }
+
+    public function latestOffer(): HasOne
+    {
+        return $this->hasOne(JobOffer::class)->latestOfMany();
+    }
+
+    public function jobOffer(): HasOne
+    {
+        return $this->hasOne(JobOffer::class)->latestOfMany();
+    }
 }

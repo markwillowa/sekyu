@@ -101,43 +101,58 @@
                         <hr class="my-8 border-slate-200">
 
                         {{-- Add Step Form --}}
-                        <form action="{{ route('agency.workflow-templates.steps.store', $workflowTemplate) }}" method="POST">
-                            @csrf
-                            <x-framework.layout.grid :cols="3">
-                                <x-framework.forms.select
-                                    name="name"
-                                    label="Step Name"
-                                    :options="$stepNames->pluck('name', 'name')->toArray()"
-                                    required
-                                />
-                                <x-framework.forms.select
-                                    name="type"
-                                    label="Step Type"
-                                    :options="[
-                                        'normal' => 'Normal',
-                                        'interview' => 'Interview',
-                                        'document_request' => 'Document Request',
-                                        'medical_exam' => 'Medical Exam',
-                                        'training' => 'Training',
-                                        'job_offer' => 'Job Offer',
-                                        'deployment' => 'Deployment'
-                                    ]"
-                                    required
-                                />
-                                <div class="flex items-end pb-1">
-                                    <x-framework.buttons.secondary type="submit" class="w-full">
-                                        Add Step
-                                    </x-framework.buttons.secondary>
+                        <div class="mt-8">
+                            @if ($errors->any())
+                                <div class="mb-4">
+                                    <x-framework.feedback.alert type="danger">
+                                        <ul class="list-inside list-disc">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </x-framework.feedback.alert>
                                 </div>
-                            </x-framework.layout.grid>
+                            @endif
+                            <form action="{{ route('agency.workflow-templates.steps.store', $workflowTemplate) }}" method="POST">
+                                @csrf
+                                <x-framework.layout.grid :cols="3">
+                                    <x-framework.forms.select
+                                        name="name"
+                                        label="Step Name"
+                                        :options="$stepNames->pluck('name', 'name')->toArray()"
+                                        :selected="old('name')"
+                                        required
+                                    />
+                                    <x-framework.forms.select
+                                        name="type"
+                                        label="Step Type"
+                                        :options="[
+                                            'normal' => 'Normal',
+                                            'interview' => 'Interview',
+                                            'document_request' => 'Document Request',
+                                            'medical_exam' => 'Medical Exam',
+                                            'training' => 'Training',
+                                            'job_offer' => 'Job Offer',
+                                            'deployment' => 'Deployment'
+                                        ]"
+                                        :selected="old('type')"
+                                        required
+                                    />
+                                    <div class="flex items-end pb-1">
+                                        <x-framework.buttons.primary type="submit" class="w-full">
+                                            Add Step
+                                        </x-framework.buttons.primary>
+                                    </div>
+                                </x-framework.layout.grid>
 
-                            <div class="mt-4">
-                                <x-framework.forms.checkbox
-                                    name="is_terminal"
-                                    label="This is a terminal step (ends the workflow)"
-                                />
-                            </div>
-                        </form>
+                                <div class="mt-4">
+                                    <x-framework.forms.checkbox
+                                        name="is_terminal"
+                                        label="This is a terminal step (ends the workflow)"
+                                    />
+                                </div>
+                            </form>
+                        </div>
                     </x-framework.layout.section>
                 </x-framework.layout.card>
 

@@ -51,6 +51,84 @@
                              </x-framework.buttons.secondary>
                         </div>
                     </div>
+
+                    {{-- Job Offer Card --}}
+                    @if($application->jobOffer && $application->jobOffer->status !== 'Draft')
+                        <div class="mt-6 bg-white p-6 rounded-2xl border border-blue-200 shadow-sm ring-1 ring-blue-50">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-bold text-slate-900">Job Offer</h3>
+                                <x-framework.feedback.badge :color="match($application->jobOffer->status) {
+                                    'Sent' => 'blue',
+                                    'Accepted' => 'green',
+                                    'Declined' => 'red',
+                                    default => 'slate'
+                                }">
+                                    {{ $application->jobOffer->status }}
+                                </x-framework.feedback.badge>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Monthly Salary</span>
+                                            <span class="text-blue-700 font-bold text-lg">₱{{ number_format($application->jobOffer->salary, 2) }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Start Date</span>
+                                            <span class="text-slate-900 font-bold">{{ $application->jobOffer->start_date->format('M d, Y') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Employment Type</span>
+                                        <span class="text-slate-900 font-medium">{{ $application->jobOffer->employment_type }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Location</span>
+                                        <span class="text-slate-900 font-medium">{{ $application->jobOffer->location }}</span>
+                                    </div>
+                                </div>
+
+                                @if($application->jobOffer->benefits)
+                                    <div>
+                                        <span class="text-xs text-slate-400 block uppercase font-bold tracking-tighter">Benefits</span>
+                                        <p class="text-sm text-slate-600 italic">{{ $application->jobOffer->benefits }}</p>
+                                    </div>
+                                @endif
+
+                                <div class="pt-6 border-t border-slate-100 space-y-3">
+                                    @if($application->jobOffer->status === 'Sent')
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <form action="{{ route('applicant.offers.accept', $application->jobOffer) }}" method="POST">
+                                                @csrf
+                                                <x-framework.buttons.primary type="submit" class="w-full justify-center">
+                                                    Accept Offer
+                                                </x-framework.buttons.primary>
+                                            </form>
+                                            <form action="{{ route('applicant.offers.decline', $application->jobOffer) }}" method="POST">
+                                                @csrf
+                                                <x-framework.buttons.secondary type="submit" class="w-full justify-center text-red-600 hover:text-red-700">
+                                                    Decline
+                                                </x-framework.buttons.secondary>
+                                            </form>
+                                        </div>
+                                    @endif
+
+                                    @if($application->jobOffer->hasMedia('offer_letter'))
+                                        <div class="mt-4 pt-4 border-t border-slate-100">
+                                            <a href="{{ route('applicant.offers.download', $application->jobOffer) }}" class="inline-flex w-full items-center justify-center px-4 py-2 border border-slate-300 shadow-sm text-sm font-bold rounded-xl text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                <x-framework.icon name="arrow-down-tray" class="h-4 w-4 mr-2" />
+                                                Download Offer Letter (PDF)
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Timeline --}}

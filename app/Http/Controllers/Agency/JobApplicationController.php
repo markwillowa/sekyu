@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Agency;
 
 use App\Http\Controllers\Controller;
 use App\Models\MasterInterviewType;
+use App\Models\MasterSalaryType;
 use App\Models\JobApplication;
 use App\Models\GuardProfile;
 use App\Notifications\ApplicationStepChanged;
@@ -82,6 +83,7 @@ class JobApplicationController extends Controller
 
         $application->load([
             'job.workflowTemplate.steps',
+            'jobOffer',
             'applicant.guardProfile' => function ($query) {
                 $query->with([
                     'workExperiences',
@@ -104,8 +106,9 @@ class JobApplicationController extends Controller
         $workflowSteps = $application->job->workflowTemplate->steps;
         $profileCompletion = $completionService->calculate($application->applicant->guardProfile);
         $interviewTypes = MasterInterviewType::where('is_active', true)->orderBy('sort_order')->get();
+        $salaryTypes = MasterSalaryType::where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('agency.applications.show', compact('application', 'workflowSteps', 'profileCompletion', 'interviewTypes'));
+        return view('agency.applications.show', compact('application', 'workflowSteps', 'profileCompletion', 'interviewTypes', 'salaryTypes'));
     }
 
     public function move(Request $request, JobApplication $application)
