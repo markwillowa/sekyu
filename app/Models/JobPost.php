@@ -42,6 +42,7 @@ class JobPost extends Model
         'work_location_type_id' => 'integer',
         'salary_type_id' => 'integer',
         'job_status_id' => 'integer',
+        'vacancies' => 'integer',
         'published_at' => 'datetime',
         'expires_at' => 'datetime',
     ];

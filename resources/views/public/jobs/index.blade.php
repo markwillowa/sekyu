@@ -2,7 +2,7 @@
 
 @section('content')
     <div x-data="jobIndex({
-        savedJobIds: {{ auth()->check() ? auth()->user()->savedJobs->pluck('id')->toJson() : '[]' }},
+        savedJobIds: {{ auth()->check() ? $savedJobs->pluck('id')->toJson() : '[]' }},
         isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
         loginUrl: '{{ route('login') }}',
         csrfToken: '{{ csrf_token() }}'

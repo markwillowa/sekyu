@@ -41,6 +41,30 @@
                                 {{ $identification->identificationType?->name ?? $identification->id_type ?? 'Identification' }}
                             </h3>
 
+                            @if($identification->hasMedia('identifications'))
+                                <div class="mt-3">
+                                    @php
+                                        $media = $identification->getFirstMedia('identifications');
+                                        $isPdf = $media && $media->mime_type === 'application/pdf';
+                                    @endphp
+                                    <a href="{{ $identification->getFirstMediaUrl('identifications') }}" target="_blank" class="group relative inline-block">
+                                        @if($isPdf)
+                                            <div class="flex h-20 w-20 flex-col items-center justify-center rounded-lg border border-slate-200 bg-slate-50 transition-opacity group-hover:opacity-75">
+                                                <svg class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                </svg>
+                                                <span class="mt-1 text-[8px] font-medium text-slate-500 uppercase">PDF</span>
+                                            </div>
+                                        @else
+                                            <img src="{{ $identification->getFirstMediaUrl('identifications') }}" alt="Identification" class="h-20 w-20 rounded-lg object-cover border border-slate-200 transition-opacity group-hover:opacity-75">
+                                        @endif
+                                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span class="bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">View</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endif
+
                             <p class="mt-1 text-sm text-slate-500">
                                 ID Number:
                                 {{ $identification->id_number ?? 'Not provided' }}
@@ -77,7 +101,7 @@
 
                     <!-- Edit Identification Modal -->
                     <x-framework.feedback.modal name="edit-identification-{{ $identification->id }}" title="Edit Identification">
-                        <form action="{{ route('applicant.profile.update-identification', $identification) }}" method="POST" class="space-y-4">
+                        <form action="{{ route('applicant.profile.update-identification', $identification) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                             @csrf
                             @method('PATCH')
 
@@ -96,6 +120,8 @@
                                 <x-framework.forms.input type="date" name="expires_at" label="Expiration Date" value="{{ $identification->expires_at?->format('Y-m-d') }}" />
                             </div>
 
+                            <x-framework.forms.file name="attachment" label="ID Attachment (Image or PDF)" accept="image/*,.pdf" />
+
                             <div class="mt-6 flex justify-end gap-3">
                                 <x-framework.buttons.secondary type="button" @click="$dispatch('close-modal', 'edit-identification-{{ $identification->id }}')">
                                     Cancel
@@ -113,7 +139,7 @@
 
     <!-- Add Identification Modal -->
     <x-framework.feedback.modal name="add-identification" title="Add Identification">
-        <form action="{{ route('applicant.profile.store-identification') }}" method="POST" class="space-y-4">
+        <form action="{{ route('applicant.profile.store-identification') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
 
             <x-framework.forms.select name="master_identification_type_id" label="ID Type" required>
@@ -131,6 +157,8 @@
                 <x-framework.forms.input type="date" name="issued_at" label="Date Issued" />
                 <x-framework.forms.input type="date" name="expires_at" label="Expiration Date" />
             </div>
+
+            <x-framework.forms.file name="attachment" label="ID Attachment" accept="image/*" />
 
             <div class="mt-6 flex justify-end gap-3">
                 <x-framework.buttons.secondary type="button" @click="$dispatch('close-modal', 'add-identification')">

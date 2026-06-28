@@ -179,6 +179,81 @@
                 @endif
             </div>
 
+            <div class="mt-10">
+                @if($latestJobApplications->isEmpty())
+                    <x-framework.layout.empty-state
+                        title="No Applicants Yet"
+                        description="Once you have job posts, applicants will appear here."
+                    />
+                @else
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-slate-900">Latest Applicants</h2>
+                        <a href="{{ route('agency.applications.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500">
+                            View all applicants &rarr;
+                        </a>
+                    </div>
+
+                    <x-framework.table.table>
+                        <x-framework.table.head>
+                            <tr>
+                                <x-framework.table.th>Applicant</x-framework.table.th>
+                                <x-framework.table.th>Job Applied</x-framework.table.th>
+                                <x-framework.table.th>Status</x-framework.table.th>
+                                <x-framework.table.th>Date Applied</x-framework.table.th>
+                                <x-framework.table.th class="text-right">Actions</x-framework.table.th>
+                            </tr>
+                        </x-framework.table.head>
+
+                        <x-framework.table.body>
+                            @foreach($latestJobApplications as $application)
+                                <x-framework.table.row>
+                                    <x-framework.table.td>
+                                        <div class="flex items-center">
+                                            <div class="h-8 w-8 flex-shrink-0">
+                                                @if($application->applicant->guardProfile && $application->applicant->guardProfile->hasMedia('profile-photo'))
+                                                    <img class="h-8 w-8 rounded-full object-cover" src="{{ $application->applicant->guardProfile->getFirstMediaUrl('profile-photo') }}" alt="">
+                                                @else
+                                                    <div class="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center">
+                                                        <x-framework.icon name="user" class="h-4 w-4 text-slate-400" />
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="font-semibold text-slate-900">{{ $application->applicant->name }}</div>
+                                            </div>
+                                        </div>
+                                    </x-framework.table.td>
+
+                                    <x-framework.table.td>
+                                        <div class="text-slate-900">{{ $application->job->title }}</div>
+                                    </x-framework.table.td>
+
+                                    <x-framework.table.td>
+                                        <x-framework.feedback.badge color="blue">
+                                            {{ optional($application->currentStep)->name ?? 'Applied' }}
+                                        </x-framework.feedback.badge>
+                                    </x-framework.table.td>
+
+                                    <x-framework.table.td>
+                                        {{ $application->applied_at->format('M d, Y') }}
+                                    </x-framework.table.td>
+
+                                    <x-framework.table.td class="text-right">
+                                        <x-framework.buttons.secondary
+                                            :href="route('agency.applications.show', $application)"
+                                            size="sm"
+                                        >
+                                            <x-framework.icon name="eye" class="mr-1.5 h-3.5 w-3.5" />
+                                            View
+                                        </x-framework.buttons.secondary>
+                                    </x-framework.table.td>
+                                </x-framework.table.row>
+                            @endforeach
+                        </x-framework.table.body>
+                    </x-framework.table.table>
+                @endif
+            </div>
+
         </div>
     </section>
 @endsection

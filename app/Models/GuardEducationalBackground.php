@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class GuardEducationalBackground extends Model
+class GuardEducationalBackground extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     protected $fillable = [
         'guard_profile_id',
         'level',
@@ -27,5 +30,11 @@ class GuardEducationalBackground extends Model
     public function guardProfile(): BelongsTo
     {
         return $this->belongsTo(GuardProfile::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('attachments')
+            ->singleFile();
     }
 }

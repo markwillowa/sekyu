@@ -33,12 +33,19 @@ class DashboardController extends Controller
 
         $applicationsCount = $agency->jobApplications()->count();
 
+        $latestJobApplications = $agency->jobApplications()
+            ->with(['applicant.guardProfile', 'job', 'currentStep'])
+            ->orderByDesc('applied_at')
+            ->take(5)
+            ->get();
+
         return view('agency.dashboard', [
             'activeJobsCount' => $activeJobsCount,
             'draftJobsCount' => $draftJobsCount,
             'applicationsCount' => $applicationsCount,
             'interviewsCount' => 0,   // Placeholder
             'latestJobPosts' => $latestJobPosts,
+            'latestJobApplications' => $latestJobApplications,
         ]);
     }
 }

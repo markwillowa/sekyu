@@ -18,12 +18,18 @@ class JobController extends Controller
 
         $query = JobPost::query()
             ->whereIn('job_status_id', $statusIds)
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
             ->with([
-                'agency' => function($q) {
-                    $q->withCount(['jobPosts as active_jobs_count' => function($sq) {
-                        $sq->whereHas('status', function($ssq) {
-                            $ssq->whereIn('code', ['published', 'active']);
-                        });
+                'agency' => function($q) use ($statusIds) {
+                    $q->withCount(['jobPosts as active_jobs_count' => function($sq) use ($statusIds) {
+                        $sq->whereIn('job_status_id', $statusIds)
+                            ->where(function ($q) {
+                                $q->whereNull('expires_at')
+                                    ->orWhere('expires_at', '>', now());
+                            });
                     }]);
                 },
                 'employmentType',
@@ -95,6 +101,10 @@ class JobController extends Controller
         if (auth()->check()) {
             $savedJobs = auth()->user()->savedJobs()
                 ->whereIn('job_status_id', $statusIds)
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')
+                        ->orWhere('expires_at', '>', now());
+                })
                 ->with([
                     'agency' => function($q) use ($statusIds) {
                         $q->withCount(['jobPosts as active_jobs_count' => function($sq) use ($statusIds) {
@@ -117,11 +127,13 @@ class JobController extends Controller
                     ->orWhere('expires_at', '>', now());
             })
             ->with([
-                'agency' => function($q) {
-                    $q->withCount(['jobPosts as active_jobs_count' => function($sq) {
-                        $sq->whereHas('status', function($ssq) {
-                            $ssq->whereIn('code', ['published', 'active']);
-                        });
+                'agency' => function($q) use ($statusIds) {
+                    $q->withCount(['jobPosts as active_jobs_count' => function($sq) use ($statusIds) {
+                        $sq->whereIn('job_status_id', $statusIds)
+                            ->where(function ($q) {
+                                $q->whereNull('expires_at')
+                                    ->orWhere('expires_at', '>', now());
+                            });
                     }]);
                 },
                 'employmentType',

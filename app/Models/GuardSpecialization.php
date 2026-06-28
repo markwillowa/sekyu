@@ -16,6 +16,7 @@ class GuardSpecialization extends Model
     ];
 
     protected $casts = [
+        'years_of_experience' => 'integer',
         'primary' => 'boolean',
     ];
 

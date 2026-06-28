@@ -168,17 +168,26 @@
                                     <div class="absolute left-[-4px] top-2 h-2.5 w-2.5 rounded-full border-2 border-white bg-blue-600 ring-2 ring-blue-50"></div>
 
                                     <h3 class="font-bold text-slate-900">
-                                        {{ $experience->job_title }}
+                                        {{ $experience->position ?? $experience->job_title }}
                                     </h3>
 
                                     <p class="text-sm font-semibold text-blue-600">
                                         {{ $experience->company_name }}
                                     </p>
 
+                                    @if ($experience->hasMedia('attachments'))
+                                        <div class="mt-2 flex items-center space-x-2">
+                                            <a href="{{ $experience->getFirstMediaUrl('attachments') }}" target="_blank" class="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center">
+                                                <x-framework.icon name="document-text" class="h-3 w-3 mr-1" />
+                                                View Attachment
+                                            </a>
+                                        </div>
+                                    @endif
+
                                     <p class="mt-1 text-xs text-slate-500">
-                                        {{ $experience->start_date?->format('M Y') ?? 'Unknown' }}
+                                        {{ $experience->started_at?->format('M Y') ?? 'Unknown' }}
                                         —
-                                        {{ $experience->is_current ? 'Present' : ($experience->end_date?->format('M Y') ?? 'Unknown') }}
+                                        {{ $experience->is_current ? 'Present' : ($experience->ended_at?->format('M Y') ?? 'Unknown') }}
                                     </p>
 
                                     @if ($experience->description)
@@ -208,7 +217,7 @@
                                     </div>
                                     <div>
                                         <h3 class="font-bold text-slate-900">
-                                            {{ $education->level }}
+                                            {{ $education->level }} {{ $education->course_or_strand ? '- ' . $education->course_or_strand : '' }}
                                         </h3>
                                         <p class="text-sm text-slate-700">
                                             {{ $education->school_name }}
@@ -216,6 +225,15 @@
                                         <p class="text-xs text-slate-500">
                                             {{ $education->started_year ?? 'Unknown' }} — {{ $education->ended_year ?? 'Present' }}
                                         </p>
+
+                                        @if ($education->hasMedia('attachments'))
+                                            <div class="mt-2 flex items-center space-x-2">
+                                                <a href="{{ $education->getFirstMediaUrl('attachments') }}" target="_blank" class="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center">
+                                                    <x-framework.icon name="document-text" class="h-3 w-3 mr-1" />
+                                                    View Attachment
+                                                </a>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             @empty
@@ -234,35 +252,182 @@
                         <div class="mt-6 grid gap-4 sm:grid-cols-2">
                             @foreach ($profile->licenses as $license)
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <h3 class="font-bold text-slate-900 text-sm">
-                                        {{ $license->licenseType?->name ?? 'License' }}
-                                    </h3>
-                                    <p class="mt-1 text-xs text-slate-500">
-                                        License #: {{ $license->license_number }}
-                                    </p>
-                                    <p class="mt-1 text-xs text-slate-500">
-                                        Expires: {{ $license->expires_at?->format('M d, Y') ?? 'N/A' }}
-                                    </p>
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-bold text-slate-900 text-sm">
+                                                {{ $license->licenseType?->name ?? 'License' }}
+                                            </h3>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                License #: {{ $license->license_number }}
+                                            </p>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                Expires: {{ $license->expires_at?->format('M d, Y') ?? 'N/A' }}
+                                            </p>
+                                        </div>
+                                        @if($license->hasMedia('licenses'))
+                                            <a href="{{ $license->getFirstMediaUrl('licenses') }}" target="_blank" class="text-blue-600 hover:text-blue-700" title="View Attachment">
+                                                <x-framework.icon name="document-text" class="h-5 w-5" />
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                             @endforeach
 
                             @foreach ($profile->trainings as $training)
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <h3 class="font-bold text-slate-900 text-sm">
-                                        {{ $training->trainingType?->name ?? 'Training' }}
-                                    </h3>
-                                    <p class="mt-1 text-xs text-slate-500">
-                                        {{ $training->provider ?? 'Provider not specified' }}
-                                    </p>
-                                    @if($training->completion_date)
-                                        <p class="mt-1 text-xs text-slate-500">
-                                            Completed: {{ $training->completion_date->format('M Y') }}
-                                        </p>
-                                    @endif
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-bold text-slate-900 text-sm">
+                                                {{ $training->trainingType?->name ?? 'Training' }}
+                                            </h3>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                {{ $training->provider ?? 'Provider not specified' }}
+                                            </p>
+                                            @if($training->completion_date)
+                                                <p class="mt-1 text-xs text-slate-500">
+                                                    Completed: {{ $training->completion_date->format('M Y') }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                        @if($training->hasMedia('trainings'))
+                                            <a href="{{ $training->getFirstMediaUrl('trainings') }}" target="_blank" class="text-blue-600 hover:text-blue-700" title="View Attachment">
+                                                <x-framework.icon name="document-text" class="h-5 w-5" />
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            @foreach ($profile->certifications as $certification)
+                                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-bold text-slate-900 text-sm">
+                                                {{ $certification->name }}
+                                            </h3>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                {{ $certification->issuing_organization }}
+                                            </p>
+                                            @if($certification->issued_at)
+                                                <p class="mt-1 text-xs text-slate-500">
+                                                    Issued: {{ $certification->issued_at->format('M Y') }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                        @if($certification->hasMedia('certificates'))
+                                            <a href="{{ $certification->getFirstMediaUrl('certificates') }}" target="_blank" class="text-blue-600 hover:text-blue-700" title="View Attachment">
+                                                <x-framework.icon name="document-text" class="h-5 w-5" />
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
                     </section>
+
+                    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Clearances, Medicals & IDs
+                        </h2>
+
+                        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                            @foreach ($profile->clearances as $clearance)
+                                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-bold text-slate-900 text-sm">
+                                                {{ $clearance->clearanceType?->name ?? 'Clearance' }}
+                                            </h3>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                {{ $clearance->issuing_office ?? 'Office not specified' }}
+                                            </p>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                Expires: {{ $clearance->expires_at?->format('M d, Y') ?? 'N/A' }}
+                                            </p>
+                                        </div>
+                                        @if($clearance->hasMedia('clearances'))
+                                            <a href="{{ $clearance->getFirstMediaUrl('clearances') }}" target="_blank" class="text-blue-600 hover:text-blue-700" title="View Attachment">
+                                                <x-framework.icon name="document-text" class="h-5 w-5" />
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            @foreach ($profile->medicals as $medical)
+                                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-bold text-slate-900 text-sm">
+                                                {{ $medical->certificate_type ?? 'Medical' }}
+                                            </h3>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                {{ $medical->clinic_or_hospital ?? 'Clinic not specified' }}
+                                            </p>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                {{ $medical->is_fit_to_work ? 'Fit to Work' : 'Unfit' }}
+                                            </p>
+                                        </div>
+                                        @if($medical->hasMedia('medical'))
+                                            <a href="{{ $medical->getFirstMediaUrl('medical') }}" target="_blank" class="text-blue-600 hover:text-blue-700" title="View Attachment">
+                                                <x-framework.icon name="document-text" class="h-5 w-5" />
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            @foreach ($profile->identifications as $id)
+                                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-bold text-slate-900 text-sm">
+                                                {{ $id->identificationType?->name ?? $id->id_type ?? 'ID' }}
+                                            </h3>
+                                            <p class="mt-1 text-xs text-slate-500">
+                                                ID #: {{ $id->id_number }}
+                                            </p>
+                                        </div>
+                                        @if($id->hasMedia('identifications'))
+                                            <a href="{{ $id->getFirstMediaUrl('identifications') }}" target="_blank" class="text-blue-600 hover:text-blue-700" title="View Attachment">
+                                                <x-framework.icon name="document-text" class="h-5 w-5" />
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+
+                    @if($profile->firearmQualification)
+                         <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                            <h2 class="text-xl font-bold text-slate-900">
+                                Firearm Qualification
+                            </h2>
+
+                            <div class="mt-6">
+                                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-bold text-slate-900 text-sm">
+                                                {{ $profile->firearmQualification->is_firearm_qualified ? 'Qualified' : 'Not Qualified' }}
+                                            </h3>
+                                            @if($profile->firearmQualification->firearm_type)
+                                                <p class="mt-1 text-xs text-slate-500">
+                                                    Type: {{ $profile->firearmQualification->firearm_type }}
+                                                </p>
+                                            @endif
+                                            @if($profile->firearmQualification->permit_number)
+                                                <p class="mt-1 text-xs text-slate-500">
+                                                    Permit #: {{ $profile->firearmQualification->permit_number }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    @endif
 
                 </main>
 

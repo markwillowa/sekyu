@@ -200,6 +200,9 @@ Route::prefix('applicant')
             Route::delete('/profile/identifications/{identification}', [ProfileController::class, 'deleteIdentification'])
                 ->name('profile.delete-identification');
 
+            Route::post('/profile/documents', [ProfileController::class, 'updateDocuments'])
+                ->name('profile.update-documents');
+
             Route::get('/applications', [GuardJobApplicationController::class, 'index'])
                 ->name('applications.index');
 

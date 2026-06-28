@@ -221,10 +221,16 @@ class ProfileController extends Controller
             'started_year' => 'nullable|integer|min:1900|max:'.date('Y'),
             'ended_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 10),
             'description' => 'nullable|string',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $profile = $request->user()->guardProfile;
-        $profile->educations()->create($validated);
+        $education = $profile->educations()->create($validated);
+
+        if ($request->hasFile('attachment')) {
+            $education->addMediaFromRequest('attachment')
+                ->toMediaCollection('attachments');
+        }
 
         return back()->with('success', 'Education record added successfully.');
     }
@@ -238,9 +244,15 @@ class ProfileController extends Controller
             'started_year' => 'nullable|integer|min:1900|max:'.date('Y'),
             'ended_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 10),
             'description' => 'nullable|string',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $education->update($validated);
+
+        if ($request->hasFile('attachment')) {
+            $education->addMediaFromRequest('attachment')
+                ->toMediaCollection('attachments');
+        }
 
         return back()->with('success', 'Education record updated successfully.');
     }
@@ -260,16 +272,22 @@ class ProfileController extends Controller
             'issued_at' => 'nullable|date',
             'expires_at' => 'nullable|date',
             'credential_id' => 'nullable|string|max:255',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $profile = $request->user()->guardProfile;
-        $profile->certifications()->create([
+        $certification = $profile->certifications()->create([
             'name' => $validated['name'],
             'issuing_organization' => $validated['issuer'],
             'issued_at' => $validated['issued_at'],
             'expires_at' => $validated['expires_at'],
             'credential_number' => $validated['credential_id'],
         ]);
+
+        if ($request->hasFile('attachment')) {
+            $certification->addMediaFromRequest('attachment')
+                ->toMediaCollection('certificates');
+        }
 
         return back()->with('success', 'Certification added successfully.');
     }
@@ -282,6 +300,7 @@ class ProfileController extends Controller
             'issued_at' => 'nullable|date',
             'expires_at' => 'nullable|date',
             'credential_id' => 'nullable|string|max:255',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $certification->update([
@@ -291,6 +310,11 @@ class ProfileController extends Controller
             'expires_at' => $validated['expires_at'],
             'credential_number' => $validated['credential_id'],
         ]);
+
+        if ($request->hasFile('attachment')) {
+            $certification->addMediaFromRequest('attachment')
+                ->toMediaCollection('certificates');
+        }
 
         return back()->with('success', 'Certification updated successfully.');
     }
@@ -376,10 +400,16 @@ class ProfileController extends Controller
             'issued_at' => 'required|date',
             'expires_at' => 'nullable|date',
             'issuing_authority' => 'nullable|string|max:255',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $profile = $request->user()->guardProfile;
-        $profile->licenses()->create($validated);
+        $license = $profile->licenses()->create($validated);
+
+        if ($request->hasFile('attachment')) {
+            $license->addMediaFromRequest('attachment')
+                ->toMediaCollection('licenses');
+        }
 
         return back()->with('success', 'License added successfully.');
     }
@@ -392,9 +422,15 @@ class ProfileController extends Controller
             'issued_at' => 'required|date',
             'expires_at' => 'nullable|date',
             'issuing_authority' => 'nullable|string|max:255',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $license->update($validated);
+
+        if ($request->hasFile('attachment')) {
+            $license->addMediaFromRequest('attachment')
+                ->toMediaCollection('licenses');
+        }
 
         return back()->with('success', 'License updated successfully.');
     }
@@ -482,9 +518,15 @@ class ProfileController extends Controller
             'hours' => 'nullable|integer|min:0',
             'certificate_number' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
-        $request->user()->guardProfile->trainings()->create($validated);
+        $training = $request->user()->guardProfile->trainings()->create($validated);
+
+        if ($request->hasFile('attachment')) {
+            $training->addMediaFromRequest('attachment')
+                ->toMediaCollection('trainings');
+        }
 
         return back()->with('success', 'Training added successfully.');
     }
@@ -499,9 +541,15 @@ class ProfileController extends Controller
             'hours' => 'nullable|integer|min:0',
             'certificate_number' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $training->update($validated);
+
+        if ($request->hasFile('attachment')) {
+            $training->addMediaFromRequest('attachment')
+                ->toMediaCollection('trainings');
+        }
 
         return back()->with('success', 'Training updated successfully.');
     }
@@ -550,9 +598,15 @@ class ProfileController extends Controller
             'issued_at' => 'nullable|date',
             'expires_at' => 'nullable|date|after_or_equal:issued_at',
             'issuing_office' => 'nullable|string|max:255',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
-        $request->user()->guardProfile->clearances()->create($validated);
+        $clearance = $request->user()->guardProfile->clearances()->create($validated);
+
+        if ($request->hasFile('attachment')) {
+            $clearance->addMediaFromRequest('attachment')
+                ->toMediaCollection('clearances');
+        }
 
         return back()->with('success', 'Clearance added successfully.');
     }
@@ -565,9 +619,15 @@ class ProfileController extends Controller
             'issued_at' => 'nullable|date',
             'expires_at' => 'nullable|date|after_or_equal:issued_at',
             'issuing_office' => 'nullable|string|max:255',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $clearance->update($validated);
+
+        if ($request->hasFile('attachment')) {
+            $clearance->addMediaFromRequest('attachment')
+                ->toMediaCollection('clearances');
+        }
 
         return back()->with('success', 'Clearance updated successfully.');
     }
@@ -588,9 +648,15 @@ class ProfileController extends Controller
             'issued_at' => 'nullable|date',
             'expires_at' => 'nullable|date|after_or_equal:issued_at',
             'is_fit_to_work' => 'boolean',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
-        $request->user()->guardProfile->medicals()->create($validated);
+        $medical = $request->user()->guardProfile->medicals()->create($validated);
+
+        if ($request->hasFile('attachment')) {
+            $medical->addMediaFromRequest('attachment')
+                ->toMediaCollection('medical');
+        }
 
         return back()->with('success', 'Medical record added successfully.');
     }
@@ -604,9 +670,15 @@ class ProfileController extends Controller
             'issued_at' => 'nullable|date',
             'expires_at' => 'nullable|date|after_or_equal:issued_at',
             'is_fit_to_work' => 'boolean',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $medical->update($validated);
+
+        if ($request->hasFile('attachment')) {
+            $medical->addMediaFromRequest('attachment')
+                ->toMediaCollection('medical');
+        }
 
         return back()->with('success', 'Medical record updated successfully.');
     }
@@ -627,9 +699,15 @@ class ProfileController extends Controller
             'issued_at' => 'nullable|date',
             'expires_at' => 'nullable|date|after_or_equal:issued_at',
             'issuing_authority' => 'nullable|string|max:255',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
-        $request->user()->guardProfile->identifications()->create($validated);
+        $identification = $request->user()->guardProfile->identifications()->create($validated);
+
+        if ($request->hasFile('attachment')) {
+            $identification->addMediaFromRequest('attachment')
+                ->toMediaCollection('identifications');
+        }
 
         return back()->with('success', 'Identification added successfully.');
     }
@@ -643,9 +721,15 @@ class ProfileController extends Controller
             'issued_at' => 'nullable|date',
             'expires_at' => 'nullable|date|after_or_equal:issued_at',
             'issuing_authority' => 'nullable|string|max:255',
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
         ]);
 
         $identification->update($validated);
+
+        if ($request->hasFile('attachment')) {
+            $identification->addMediaFromRequest('attachment')
+                ->toMediaCollection('identifications');
+        }
 
         return back()->with('success', 'Identification updated successfully.');
     }
@@ -655,6 +739,28 @@ class ProfileController extends Controller
         $identification->delete();
 
         return back()->with('success', 'Identification removed successfully.');
+    }
+
+    public function updateDocuments(Request $request)
+    {
+        $request->validate([
+            'profile_photo' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+            'resume' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+        ]);
+
+        $profile = $request->user()->guardProfile;
+
+        if ($request->hasFile('profile_photo')) {
+            $profile->addMediaFromRequest('profile_photo')
+                ->toMediaCollection('profile-photo');
+        }
+
+        if ($request->hasFile('resume')) {
+            $profile->addMediaFromRequest('resume')
+                ->toMediaCollection('resume');
+        }
+
+        return back()->with('success', 'Documents updated successfully.');
     }
 
     public function preview(Request $request): View

@@ -26,6 +26,7 @@ class GuardTraining extends Model implements HasMedia
     protected $casts = [
         'started_at' => 'date',
         'completed_at' => 'date',
+        'hours' => 'integer',
     ];
 
     public function guardProfile(): BelongsTo

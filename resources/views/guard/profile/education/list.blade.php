@@ -24,7 +24,7 @@
         title="Add Education"
         description="Add your educational background."
     >
-        <form action="{{ route('applicant.profile.store-education') }}" method="POST" class="space-y-6">
+        <form action="{{ route('applicant.profile.store-education') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
             <div class="grid gap-6 sm:grid-cols-2">
@@ -69,6 +69,14 @@
                         name="description"
                         rows="3"
                     ></x-framework.forms.textarea>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <x-framework.forms.file
+                        label="Attachment (Image or PDF)"
+                        name="attachment"
+                        accept="image/*,.pdf"
+                    />
                 </div>
             </div>
 

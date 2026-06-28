@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MasterSalaryType extends Model
+class MasterWorkflowStepName extends Model
 {
     protected $fillable = [
         'code',

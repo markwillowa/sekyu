@@ -47,16 +47,65 @@
                         {{ $training->training_provider ?? 'Provider not provided' }}
                     </p>
 
+                <div class="mt-2 flex gap-4">
                     @if ($training->completed_at)
-                        <p class="mt-2 text-sm text-slate-500">
+                        <p class="text-sm text-slate-500">
                             Completed {{ $training->completed_at->format('F d, Y') }}
                         </p>
                     @endif
+
+                    @if ($training->hours)
+                        <p class="text-sm text-slate-500">
+                            {{ $training->hours }} Hours
+                        </p>
+                    @endif
+                </div>
+
+                @if ($training->hasMedia('trainings'))
+                    <div class="mt-4">
+                        <p class="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                            Attachment
+                        </p>
+
+                        @php
+                            $media = $training->getFirstMedia('trainings');
+                            $isPdf = $media && $media->mime_type === 'application/pdf';
+                        @endphp
+
+                        <a
+                            href="{{ $training->getFirstMediaUrl('trainings') }}"
+                            target="_blank"
+                            class="group relative inline-block overflow-hidden rounded-xl border border-slate-200"
+                        >
+                            @if($isPdf)
+                                <div class="flex h-32 w-48 flex-col items-center justify-center bg-slate-50 transition duration-300 group-hover:bg-slate-100">
+                                    <svg class="h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="mt-2 text-xs font-medium text-slate-500">PDF Document</span>
+                                </div>
+                            @else
+                                <img
+                                    src="{{ $training->getFirstMediaUrl('trainings') }}"
+                                    alt="Training Attachment"
+                                    class="h-32 w-48 object-cover transition duration-300 group-hover:scale-110"
+                                >
+                            @endif
+
+                            <div class="absolute inset-0 flex items-center justify-center bg-slate-900/40 opacity-0 transition duration-300 group-hover:opacity-100">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                @endif
                 </article>
 
                 <!-- Edit Training Modal -->
                 <x-framework.feedback.modal name="edit-training-{{ $training->id }}" title="Edit Training">
-                    <form action="{{ route('applicant.profile.update-training', $training) }}" method="POST" class="space-y-4">
+                    <form action="{{ route('applicant.profile.update-training', $training) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         @method('PATCH')
 
@@ -112,6 +161,12 @@
                             name="description"
                         >{{ $training->description }}</x-framework.forms.textarea>
 
+                        <x-framework.forms.file
+                            label="Update Attachment (Image or PDF)"
+                            name="attachment"
+                            accept="image/*,.pdf"
+                        />
+
                         <div class="flex items-center justify-between pt-4">
                             <button
                                 type="submit"
@@ -144,7 +199,7 @@
 
     <!-- Add Training Modal -->
     <x-framework.feedback.modal name="add-training" title="Add Training">
-        <form action="{{ route('applicant.profile.store-training') }}" method="POST" class="space-y-4">
+        <form action="{{ route('applicant.profile.store-training') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
 
             <x-framework.forms.select
@@ -195,6 +250,12 @@
                 label="Description"
                 name="description"
                 placeholder="Briefly describe what you learned..."
+            />
+
+            <x-framework.forms.file
+                label="Attachment (Image or PDF)"
+                name="attachment"
+                accept="image/*,.pdf"
             />
 
             <div class="flex justify-end gap-3 pt-4">
