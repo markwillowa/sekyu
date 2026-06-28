@@ -39,7 +39,6 @@ class OnboardingController extends Controller
 
         return view('pro.agency.onboarding.create', [
             'nextEmployeeNo' => $this->nextEmployeeNumber(),
-            'nextEmployeeUsername' => $this->nextEmployeeUsername(),
             'salaryTypes' => MasterSalaryType::where('is_active', true)
                 ->orderBy('sort_order')
                 ->pluck('name', 'id'),
@@ -99,11 +98,10 @@ class OnboardingController extends Controller
 
             if ($validated['create_account'] ?? false) {
                 $temporaryPassword = ($validated['temporary_password'] ?? null) ?: $this->generateTemporaryPassword();
-                $username = ($validated['username'] ?? null) ?: $this->nextEmployeeUsername();
 
                 $employee->account()->create([
                     'agency_id' => $agency->id,
-                    'username' => $username,
+                    'username' => $this->nextEmployeeUsername(),
                     'password' => $temporaryPassword,
                     'status' => 'active',
                     'force_password_change' => true,

@@ -275,12 +275,19 @@
                         x-cloak
                         class="grid gap-5 md:grid-cols-2"
                     >
-                        <x-framework.forms.input
-                            label="Username"
-                            name="username"
-                            value="{{ old('username', $nextEmployeeUsername) }}"
-                            placeholder="{{ $nextEmployeeUsername }}"
-                        />
+                        <div>
+                            <div class="mb-2 block text-sm font-semibold text-slate-700">
+                                Username
+                            </div>
+
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                                Generated after employee creation
+                            </div>
+
+                            <p class="mt-2 text-xs leading-5 text-slate-500">
+                                The assigned username will be shown after onboarding so it stays unique across agencies.
+                            </p>
+                        </div>
 
                         <x-framework.forms.input
                             label="Temporary 6-digit PIN"

@@ -4,6 +4,8 @@ namespace App\Models\Pro;
 
 use App\Models\Agency;
 use App\Models\GuardProfile;
+use App\Models\MasterDepartment;
+use App\Models\MasterPosition;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -28,6 +30,8 @@ class Employee extends Model
 
         'position',
         'department',
+        'department_id',
+        'position_id',
         'employment_type',
         'employment_status',
 
@@ -80,6 +84,16 @@ class Employee extends Model
     public function account()
     {
         return $this->hasOne(EmployeeAccount::class);
+    }
+
+    public function departmentMaster()
+    {
+        return $this->belongsTo(MasterDepartment::class, 'department_id');
+    }
+
+    public function positionMaster()
+    {
+        return $this->belongsTo(MasterPosition::class, 'position_id');
     }
 
     public function supervisor()

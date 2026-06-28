@@ -53,12 +53,6 @@ class StoreEmployeeOnboardingRequest extends FormRequest
             ],
 
             'create_account' => ['nullable', 'boolean'],
-            'username' => [
-                'nullable',
-                'string',
-                'max:255',
-                Rule::unique('pro_employee_accounts', 'username'),
-            ],
             'temporary_password' => [
                 'nullable',
                 'digits:6',

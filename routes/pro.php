@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Pro\Agency\DashboardController as AgencyDashboardController;
+use App\Http\Controllers\Pro\Agency\MessageController as AgencyMessageController;
 use App\Http\Controllers\Pro\Agency\OnboardingController;
 use App\Http\Controllers\Pro\Auth\LoginController;
 use App\Http\Controllers\Pro\Employee\DashboardController as EmployeeDashboardController;
@@ -62,6 +63,12 @@ Route::prefix('pro')
 
                 Route::get('/', [AgencyDashboardController::class, 'index'])
                     ->name('dashboard');
+
+                Route::get('/messages/{conversation?}', [AgencyMessageController::class, 'index'])
+                    ->name('messages.index');
+
+                Route::post('/messages/{conversation}', [AgencyMessageController::class, 'send'])
+                    ->name('messages.send');
 
                 Route::get('/onboarding', [OnboardingController::class, 'index'])
                     ->name('onboarding.index');

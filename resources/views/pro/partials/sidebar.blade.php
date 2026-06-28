@@ -13,6 +13,12 @@
                     'icon' => 'home',
                 ],
 
+                [
+                    'label' => 'Messages',
+                    'route' => 'pro.agency.messages.index',
+                    'icon' => 'chat-bubble-left-right',
+                ],
+
             ],
 
         ],

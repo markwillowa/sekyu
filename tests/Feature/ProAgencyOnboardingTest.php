@@ -53,6 +53,8 @@ class ProAgencyOnboardingTest extends TestCase
             ->assertSee('Onboard Employee')
             ->assertSee($eligibleProfile->full_name)
             ->assertSee($salaryType->name)
+            ->assertSee('Generated after employee creation')
+            ->assertDontSee('name="username"', false)
             ->assertDontSee($ineligibleProfile->full_name);
     }
 
@@ -158,6 +160,58 @@ class ProAgencyOnboardingTest extends TestCase
 
         $this->assertDatabaseHas('pro_employee_accounts', [
             'username' => '1000501',
+        ]);
+    }
+
+    public function test_submitted_employee_username_is_ignored_during_onboarding(): void
+    {
+        $agencyUser = $this->agencyUser();
+        $profile = $this->acceptedApplicantProfile($agencyUser->agency);
+        $existingEmployee = Employee::create([
+            'agency_id' => $agencyUser->agency_id,
+            'employee_no' => 'EMP-2026-EXISTING',
+            'first_name' => 'Existing',
+            'last_name' => 'Employee',
+            'position' => 'Security Guard',
+            'department' => 'Operations',
+            'employment_type' => 'full_time',
+            'employment_status' => EmploymentStatus::Regular->value,
+            'date_hired' => '2026-06-01',
+            'is_active' => true,
+        ]);
+
+        $existingEmployee->account()->create([
+            'agency_id' => $agencyUser->agency_id,
+            'username' => '1000500',
+            'password' => '111111',
+            'status' => 'active',
+            'force_password_change' => true,
+        ]);
+
+        $this
+            ->actingAs($agencyUser, 'pro_agency')
+            ->post(route('pro.agency.onboarding.store'), [
+                'guard_profile_id' => $profile->id,
+                'employee_no' => 'EMP-2026-00005',
+                'first_name' => $profile->first_name,
+                'last_name' => $profile->last_name,
+                'position' => 'Security Guard',
+                'department' => 'Operations',
+                'employment_type' => 'full_time',
+                'employment_status' => EmploymentStatus::Probationary->value,
+                'date_hired' => '2026-06-29',
+                'create_account' => '1',
+                'username' => '9999999',
+            ])
+            ->assertRedirect(route('pro.agency.onboarding.index'))
+            ->assertSessionHas('username', '1000501');
+
+        $this->assertDatabaseHas('pro_employee_accounts', [
+            'username' => '1000501',
+        ]);
+
+        $this->assertDatabaseMissing('pro_employee_accounts', [
+            'username' => '9999999',
         ]);
     }
 
