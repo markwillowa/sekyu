@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Guard;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobOffer;
+use App\Models\MasterJobOfferStatus;
 use App\Notifications\JobOfferResponse;
 use Illuminate\Http\Request;
 
@@ -15,12 +16,14 @@ class JobOfferController extends Controller
             abort(403);
         }
 
-        if ($offer->status !== 'Sent') {
+        if ($offer->status?->code !== 'sent') {
             return back()->with('error', 'Only sent offers can be accepted.');
         }
 
+        $acceptedStatus = MasterJobOfferStatus::where('code', 'accepted')->first();
+
         $offer->update([
-            'status' => 'Accepted',
+            'status_id' => $acceptedStatus->id,
             'accepted_at' => now(),
         ]);
 
@@ -35,12 +38,14 @@ class JobOfferController extends Controller
             abort(403);
         }
 
-        if ($offer->status !== 'Sent') {
+        if ($offer->status?->code !== 'sent') {
             return back()->with('error', 'Only sent offers can be declined.');
         }
 
+        $declinedStatus = MasterJobOfferStatus::where('code', 'declined')->first();
+
         $offer->update([
-            'status' => 'Declined',
+            'status_id' => $declinedStatus->id,
             'declined_at' => now(),
         ]);
 

@@ -43,13 +43,14 @@ class AnalyticsController extends Controller
         $bottlenecks = $this->getBottlenecks($agency);
 
         // Time to Hire
-        $avgTimeToHire = $agency->jobApplications()
+        $avgTimeToHire = JobApplication::whereHas('job', function ($query) use ($agency) {
+                $query->where('agency_id', $agency->id);
+            })
             ->whereNotNull('completed_at')
             ->whereHas('currentStep', function ($query) {
                 $query->where('is_terminal', true);
             })
-            ->select(DB::raw('AVG(DATEDIFF(completed_at, applied_at)) as avg_days'))
-            ->first()->avg_days;
+            ->avg(DB::raw('DATEDIFF(completed_at, applied_at)'));
 
         // Top Performing Jobs
         $topJobs = JobPost::where('agency_id', $agency->id)

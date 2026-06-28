@@ -6,14 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
 use App\Models\JobPost;
 use App\Notifications\NewJobApplication;
+use App\Services\Guard\ProfileCompletionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class JobApplicationController extends Controller
 {
-    public function store(Request $request, JobPost $jobPost)
+    public function store(Request $request, JobPost $jobPost, ProfileCompletionService $completionService)
     {
         $user = auth()->user();
+
+        // Check profile completion requirement
+        if ($jobPost->min_profile_completion > 0) {
+            $completion = $completionService->calculate($user->guardProfile);
+            if ($completion['percentage'] < $jobPost->min_profile_completion) {
+                $message = "Your profile is only {$completion['percentage']}% complete. This job requires at least {$jobPost->min_profile_completion}% completion to apply.";
+                if ($request->expectsJson()) {
+                    return response()->json(['error' => $message], 422);
+                }
+                return back()->with('error', $message);
+            }
+        }
 
         // Basic check if already applied
         if (JobApplication::where('job_id', $jobPost->id)->where('guard_id', $user->id)->exists()) {

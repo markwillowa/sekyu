@@ -22,7 +22,7 @@ class JobOfferResponse extends Notification
     {
         $this->offer = $offer;
         $this->application = $offer->application;
-        $this->status = $offer->status; // Accepted or Declined
+        $this->status = $offer->status?->name ?? 'Unknown'; // Accepted or Declined
     }
 
     /**

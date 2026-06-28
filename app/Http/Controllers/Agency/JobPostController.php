@@ -75,6 +75,7 @@ class JobPostController extends Controller
             'benefits' => ['nullable', 'string'],
             'vacancies' => ['required', 'integer', 'min:1'],
             'is_featured' => ['nullable', 'boolean'],
+            'min_profile_completion' => ['required', 'integer', 'min:0', 'max:100'],
             'job_status_id' => ['required', 'exists:master_job_statuses,id'],
             'expires_at' => ['nullable', 'date'],
         ]);
@@ -145,6 +146,7 @@ class JobPostController extends Controller
             'benefits' => ['nullable', 'string'],
             'vacancies' => ['required', 'integer', 'min:1'],
             'is_featured' => ['nullable', 'boolean'],
+            'min_profile_completion' => ['required', 'integer', 'min:0', 'max:100'],
             'job_status_id' => ['required', 'exists:master_job_statuses,id'],
             'expires_at' => ['nullable', 'date'],
         ]);

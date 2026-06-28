@@ -30,6 +30,7 @@ class JobPost extends Model
         'vacancies',
         'job_status_id',
         'workflow_template_id',
+        'min_profile_completion',
         'published_at',
         'expires_at',
     ];
@@ -43,6 +44,7 @@ class JobPost extends Model
         'salary_type_id' => 'integer',
         'job_status_id' => 'integer',
         'vacancies' => 'integer',
+        'min_profile_completion' => 'integer',
         'published_at' => 'datetime',
         'expires_at' => 'datetime',
     ];

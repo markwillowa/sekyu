@@ -23,15 +23,25 @@
             'icon' => 'bg-blue-100 text-blue-700',
             'border' => 'border-blue-200',
         ],
+        'indigo' => [
+            'icon' => 'bg-indigo-100 text-indigo-700',
+            'border' => 'border-indigo-200',
+        ],
+        'violet' => [
+            'icon' => 'bg-violet-100 text-violet-700',
+            'border' => 'border-violet-200',
+        ],
         'red' => [
             'icon' => 'bg-red-100 text-red-700',
             'border' => 'border-red-200',
         ],
     ];
+
+    $selectedColor = $colors[$color] ?? $colors['slate'];
 @endphp
 
 <div
-    class="rounded-3xl border {{ $colors[$color]['border'] }} bg-white p-6 shadow-sm transition hover:shadow-md"
+    class="rounded-3xl border {{ $selectedColor['border'] }} bg-white p-6 shadow-sm transition hover:shadow-md"
 >
     <div class="flex items-start justify-between">
         <div>
@@ -51,7 +61,7 @@
         </div>
 
         <div
-            class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $colors[$color]['icon'] }}"
+            class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $selectedColor['icon'] }}"
         >
             {{ $icon ?? '📊' }}
         </div>

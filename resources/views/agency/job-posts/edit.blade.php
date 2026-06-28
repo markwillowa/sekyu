@@ -65,6 +65,16 @@
                                 :value="$jobPost->vacancies"
                             />
 
+                            <x-framework.forms.input
+                                name="min_profile_completion"
+                                type="number"
+                                label="Min. Profile Completion (%)"
+                                :value="$jobPost->min_profile_completion"
+                                min="0"
+                                max="100"
+                                required
+                            />
+
                             <div class="flex items-center pt-8">
                                 <label class="flex cursor-pointer items-center gap-3">
                                     <input

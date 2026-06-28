@@ -19,6 +19,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('job_title');
+            $table->string('position')->nullable();
             $table->string('company_name');
             $table->string('location')->nullable();
 
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->date('ended_at')->nullable();
 
             $table->boolean('is_current')->default(false);
+            $table->text('description')->nullable();
 
             $table->text('responsibilities')->nullable();
             $table->text('achievements')->nullable();

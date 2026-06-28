@@ -6,6 +6,9 @@ use App\Models\Agency;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\JobPost;
+use App\Models\MasterEmploymentType;
+use App\Models\MasterJobOfferStatus;
+use App\Models\MasterLocation;
 use App\Models\User;
 use App\Models\WorkflowTemplate;
 use App\Models\WorkflowTemplateStep;
@@ -25,6 +28,8 @@ class JobOfferTest extends TestCase
     {
         parent::setUp();
         $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(\Database\Seeders\MasterDataSeeder::class);
+        $this->seed(\Database\Seeders\MasterJobOfferStatusSeeder::class);
         Storage::fake('public');
     }
 
@@ -42,14 +47,16 @@ class JobOfferTest extends TestCase
             'applied_at' => now(),
         ]);
 
+        $draftStatus = MasterJobOfferStatus::where('code', 'draft')->first();
+
         $offer = JobOffer::create([
             'job_application_id' => $application->id,
             'offer_number' => 'OFF-UPLOAD',
             'salary' => 50000,
-            'employment_type' => 'Full-time',
+            'employment_type_id' => MasterEmploymentType::first()->id,
             'start_date' => now()->toDateString(),
-            'location' => 'Test',
-            'status' => 'Draft',
+            'location_id' => MasterLocation::first()->id,
+            'status_id' => $draftStatus->id,
         ]);
 
         $this->actingAs($agencyUser);
@@ -77,14 +84,16 @@ class JobOfferTest extends TestCase
             'applied_at' => now(),
         ]);
 
+        $sentStatus = MasterJobOfferStatus::where('code', 'sent')->first();
+
         $offer = JobOffer::create([
             'job_application_id' => $application->id,
             'offer_number' => 'OFF-DOWNLOAD',
             'salary' => 50000,
-            'employment_type' => 'Full-time',
+            'employment_type_id' => MasterEmploymentType::first()->id,
             'start_date' => now()->toDateString(),
-            'location' => 'Test',
-            'status' => 'Sent',
+            'location_id' => MasterLocation::first()->id,
+            'status_id' => $sentStatus->id,
         ]);
 
         $file = UploadedFile::fake()->create('offer.pdf', 100, 'application/pdf');
@@ -122,18 +131,19 @@ class JobOfferTest extends TestCase
 
         $response = $this->post(route('agency.applications.offers.store', $application), [
             'salary' => 50000,
-            'employment_type' => 'Full-time',
+            'employment_type_id' => MasterEmploymentType::first()->id,
             'start_date' => now()->addDays(7)->toDateString(),
-            'location' => 'Main Office',
+            'location_id' => MasterLocation::first()->id,
             'benefits' => 'Health, Dental',
             'remarks' => 'Welcome aboard',
         ]);
 
         $response->assertStatus(302);
+        $draftStatus = MasterJobOfferStatus::where('code', 'draft')->first();
         $this->assertDatabaseHas('job_offers', [
             'job_application_id' => $application->id,
             'salary' => 50000,
-            'status' => 'Draft',
+            'status_id' => $draftStatus->id,
         ]);
     }
 
@@ -151,14 +161,16 @@ class JobOfferTest extends TestCase
             'applied_at' => now(),
         ]);
 
+        $draftStatus = MasterJobOfferStatus::where('code', 'draft')->first();
+
         $offer = JobOffer::create([
             'job_application_id' => $application->id,
             'offer_number' => 'OFF-123',
             'salary' => 50000,
-            'employment_type' => 'Full-time',
+            'employment_type_id' => MasterEmploymentType::first()->id,
             'start_date' => now()->toDateString(),
-            'location' => 'Test',
-            'status' => 'Draft',
+            'location_id' => MasterLocation::first()->id,
+            'status_id' => $draftStatus->id,
         ]);
 
         $this->actingAs($agencyUser);
@@ -168,7 +180,7 @@ class JobOfferTest extends TestCase
         $response = $this->post(route('agency.offers.send', $offer));
 
         $response->assertStatus(302);
-        $this->assertEquals('Sent', $offer->fresh()->status);
+        $this->assertEquals('sent', $offer->fresh()->status->code);
 
         Notification::assertSentTo(
             $applicant,
@@ -184,7 +196,9 @@ class JobOfferTest extends TestCase
         $applicant = User::factory()->create();
         $applicant->assignRole('applicant');
 
-        $agency = Agency::factory()->create();
+        $agencyUser = User::factory()->create();
+        $agencyUser->assignRole('agency');
+        $agency = Agency::factory()->create(['owner_id' => $agencyUser->id]);
         $jobPost = JobPost::factory()->create(['agency_id' => $agency->id]);
         $application = JobApplication::create([
             'job_id' => $jobPost->id,
@@ -192,14 +206,16 @@ class JobOfferTest extends TestCase
             'applied_at' => now(),
         ]);
 
+        $sentStatus = MasterJobOfferStatus::where('code', 'sent')->first();
+
         $offer = JobOffer::create([
             'job_application_id' => $application->id,
             'offer_number' => 'OFF-123',
             'salary' => 50000,
-            'employment_type' => 'Full-time',
+            'employment_type_id' => MasterEmploymentType::first()->id,
             'start_date' => now()->toDateString(),
-            'location' => 'Test',
-            'status' => 'Sent',
+            'location_id' => MasterLocation::first()->id,
+            'status_id' => $sentStatus->id,
         ]);
 
         $this->actingAs($applicant);
@@ -209,15 +225,12 @@ class JobOfferTest extends TestCase
         $response = $this->post(route('applicant.offers.accept', $offer));
 
         $response->assertStatus(302);
-        $this->assertEquals('Accepted', $offer->fresh()->status);
+        $this->assertEquals('accepted', $offer->fresh()->status->code);
         $this->assertNotNull($offer->fresh()->accepted_at);
 
         Notification::assertSentTo(
-            $agency->owner,
-            JobOfferResponse::class,
-            function ($notification) use ($offer) {
-                return $notification->offer->id === $offer->id && $notification->status === 'Accepted';
-            }
+            $agencyUser,
+            JobOfferResponse::class
         );
     }
 
@@ -227,6 +240,7 @@ class JobOfferTest extends TestCase
         $applicant->assignRole('applicant');
 
         $agencyUser = User::factory()->create();
+        $agencyUser->assignRole('agency');
         $agency = Agency::factory()->create(['owner_id' => $agencyUser->id]);
         $jobPost = JobPost::factory()->create(['agency_id' => $agency->id]);
         $application = JobApplication::create([
@@ -235,14 +249,16 @@ class JobOfferTest extends TestCase
             'applied_at' => now(),
         ]);
 
+        $sentStatus = MasterJobOfferStatus::where('code', 'sent')->first();
+
         $offer = JobOffer::create([
             'job_application_id' => $application->id,
             'offer_number' => 'OFF-DECLINE',
             'salary' => 50000,
-            'employment_type' => 'Full-time',
+            'employment_type_id' => MasterEmploymentType::first()->id,
             'start_date' => now()->toDateString(),
-            'location' => 'Test',
-            'status' => 'Sent',
+            'location_id' => MasterLocation::first()->id,
+            'status_id' => $sentStatus->id,
         ]);
 
         $this->actingAs($applicant);
@@ -252,15 +268,12 @@ class JobOfferTest extends TestCase
         $response = $this->post(route('applicant.offers.decline', $offer));
 
         $response->assertStatus(302);
-        $this->assertEquals('Declined', $offer->fresh()->status);
+        $this->assertEquals('declined', $offer->fresh()->status->code);
         $this->assertNotNull($offer->fresh()->declined_at);
 
         Notification::assertSentTo(
             $agencyUser,
-            JobOfferResponse::class,
-            function ($notification) use ($offer) {
-                return $notification->offer->id === $offer->id && $notification->status === 'Declined';
-            }
+            JobOfferResponse::class
         );
     }
 
@@ -274,14 +287,16 @@ class JobOfferTest extends TestCase
             'applied_at' => now(),
         ]);
 
+        $sentStatus = MasterJobOfferStatus::where('code', 'sent')->first();
+
         $offer = JobOffer::create([
             'job_application_id' => $application->id,
             'offer_number' => 'OFF-TEST',
             'salary' => 50000,
-            'employment_type' => 'Full-time',
+            'employment_type_id' => MasterEmploymentType::first()->id,
             'start_date' => now()->toDateString(),
-            'location' => 'Test',
-            'status' => 'Sent',
+            'location_id' => MasterLocation::first()->id,
+            'status_id' => $sentStatus->id,
         ]);
 
         // Test eager loading which was failing

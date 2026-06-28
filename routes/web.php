@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Agency\AnalyticsController;
 use App\Http\Controllers\Agency\Auth\AgencyLoginController;
 use App\Http\Controllers\Agency\Auth\AgencyRegisterController;
 use App\Http\Controllers\Agency\JobPostController;
@@ -303,6 +304,9 @@ Route::prefix('agency')
 
             Route::get('/dashboard', [\App\Http\Controllers\Agency\DashboardController::class, 'index'])
                 ->name('dashboard');
+
+            Route::get('/analytics', [AnalyticsController::class, 'index'])
+                ->name('analytics');
 
             Route::prefix('job-posts')
                 ->name('job-posts.')

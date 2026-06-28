@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('job_application_id')->constrained()->cascadeOnDelete();
             $table->foreignId('workflow_step_id')->constrained('workflow_template_steps')->cascadeOnDelete();
             $table->foreignId('interviewer_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('interview_type_id')->nullable()->constrained('master_interview_types');
             $table->string('title');
-            $table->string('type'); // On-site, Phone, Google Meet, Microsoft Teams, Zoom
             $table->dateTime('scheduled_at');
             $table->integer('duration_minutes');
             $table->string('location')->nullable();

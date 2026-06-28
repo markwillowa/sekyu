@@ -16,6 +16,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->foreignId('workflow_template_id')->nullable()->constrained()->nullOnDelete();
+            $table->integer('min_profile_completion')->default(0);
 
             $table->string('title');
             $table->string('slug')->unique();

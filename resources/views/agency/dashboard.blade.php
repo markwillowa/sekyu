@@ -21,6 +21,17 @@
                     </x-framework.buttons.primary>
 
                     <x-framework.buttons.secondary
+                        href="{{ route('agency.analytics') }}"
+                    >
+                        <x-framework.icon
+                            name="presentation-chart-bar"
+                            class="mr-2 h-5 w-5"
+                        />
+
+                        Analytics
+                    </x-framework.buttons.secondary>
+
+                    <x-framework.buttons.secondary
                         href="{{ route('agency.workflow-templates.index') }}"
                     >
                         <x-framework.icon

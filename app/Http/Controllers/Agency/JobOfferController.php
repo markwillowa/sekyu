@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Agency;
 use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
+use App\Models\MasterJobOfferStatus;
 use App\Notifications\JobOfferSent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,25 +22,26 @@ class JobOfferController extends Controller
 
         $request->validate([
             'salary' => 'required|numeric',
-            'employment_type' => 'required|string',
+            'employment_type_id' => 'required|exists:master_employment_types,id',
             'start_date' => 'required|date',
-            'location' => 'required|string',
+            'location_id' => 'required|exists:master_locations,id',
             'benefits' => 'nullable|string',
             'remarks' => 'nullable|string',
         ]);
 
         $offerNumber = 'OFF-' . strtoupper(Str::random(8));
+        $draftStatus = MasterJobOfferStatus::where('code', 'draft')->first();
 
         $offer = JobOffer::create([
             'job_application_id' => $application->id,
             'offer_number' => $offerNumber,
             'salary' => $request->salary,
-            'employment_type' => $request->employment_type,
+            'employment_type_id' => $request->employment_type_id,
             'start_date' => $request->start_date,
-            'location' => $request->location,
+            'location_id' => $request->location_id,
             'benefits' => $request->benefits,
             'remarks' => $request->remarks,
-            'status' => 'Draft',
+            'status_id' => $draftStatus->id,
         ]);
 
         return back()->with('success', 'Job offer draft created successfully.');
@@ -52,7 +54,8 @@ class JobOfferController extends Controller
             abort(403);
         }
 
-        $offer->update(['status' => 'Sent']);
+        $sentStatus = MasterJobOfferStatus::where('code', 'sent')->first();
+        $offer->update(['status_id' => $sentStatus->id]);
 
         $offer->application->applicant->notify(new JobOfferSent($offer));
 
