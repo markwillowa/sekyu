@@ -3,6 +3,7 @@
 @section('content')
     <div x-data="jobIndex({
         savedJobIds: {{ auth()->check() ? $savedJobs->pluck('id')->toJson() : '[]' }},
+        appliedJobIds: {{ auth()->check() ? auth()->user()->jobApplications->pluck('job_id')->toJson() : '[]' }},
         isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
         loginUrl: '{{ route('login') }}',
         csrfToken: '{{ csrf_token() }}'
@@ -183,9 +184,45 @@
             showDetailsPane: false,
             activeJob: null,
             savedJobIds: config.savedJobIds || [],
+            appliedJobIds: config.appliedJobIds || [], // Initialized with jobs already applied for
 
             isSaved(id) {
                 return this.savedJobIds.includes(id);
+            },
+
+            isApplied(id) {
+                return this.appliedJobIds.includes(id);
+            },
+
+            async apply(id) {
+                if (!config.isLoggedIn) {
+                    window.location.href = config.loginUrl;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/jobs/${id}/apply`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': config.csrfToken,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        this.appliedJobIds.push(id);
+                        // Optional: You could update a global notification system here
+                        // alert(data.success);
+                    } else {
+                        alert(data.error || 'Something went wrong.');
+                    }
+                } catch (error) {
+                    console.error('Error applying for job:', error);
+                    alert('An error occurred. Please try again.');
+                }
             },
 
             async toggleSave(id) {

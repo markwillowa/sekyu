@@ -5,6 +5,7 @@ use App\Http\Controllers\Agency\Auth\AgencyRegisterController;
 use App\Http\Controllers\Agency\JobPostController;
 use App\Http\Controllers\Agency\WorkflowTemplateController;
 use App\Http\Controllers\Agency\WorkflowTemplateStepController;
+use App\Http\Controllers\InterviewCalendarController;
 use App\Http\Controllers\Agency\JobApplicationController as AgencyJobApplicationController;
 use App\Http\Controllers\Guard\JobApplicationController as GuardJobApplicationController;
 use App\Http\Controllers\Guard\Auth\GuardLoginController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Public\JobController;
 use App\Http\Controllers\Public\JobApplicationController;
 use App\Http\Controllers\Public\SavedJobController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ConversationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])
@@ -27,17 +29,24 @@ Route::get('/jobs', [JobController::class, 'index'])
 
 Route::post('/jobs/{jobPost}/apply', [JobApplicationController::class, 'store'])
     ->name('jobs.apply')
-    ->middleware('auth');
+    ->middleware(['auth', 'role:applicant']);
 
 Route::post('/jobs/{jobPost}/toggle-save', [SavedJobController::class, 'toggle'])
     ->name('jobs.toggle-save')
-    ->middleware('auth');
+    ->middleware(['auth', 'role:applicant']);
 
 Route::middleware('auth')->group(function () {
+    Route::get('/interviews/{interview}/calendar', [InterviewCalendarController::class, 'download'])
+        ->name('interviews.calendar')
+        ->middleware('role:applicant|agency');
+
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])
-        ->name('notifications.mark-all-read');
+        ->name('notifications.mark-all-read')
+        ->middleware('role:applicant|agency');
+
     Route::delete('/notifications/clear', [NotificationController::class, 'clear'])
-        ->name('notifications.clear');
+        ->name('notifications.clear')
+        ->middleware('role:applicant|agency');
 });
 
 Route::get('/login', [GuardLoginController::class, 'create'])
@@ -66,7 +75,7 @@ Route::prefix('applicant')
                 ->name('register.store');
         });
 
-        Route::middleware('auth')->group(function () {
+        Route::middleware(['auth', 'role:applicant'])->group(function () {
             Route::post('/logout', [GuardLoginController::class, 'destroy'])
                 ->name('logout');
 
@@ -208,6 +217,12 @@ Route::prefix('applicant')
 
             Route::get('/applications/{application}', [GuardJobApplicationController::class, 'show'])
                 ->name('applications.show');
+
+            Route::get('/applications/{application}/messages', [ConversationController::class, 'show'])
+                ->name('applications.messages');
+
+            Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage'])
+                ->name('conversations.messages.send');
         });
     });
 
@@ -270,7 +285,7 @@ Route::prefix('agency')
         |--------------------------------------------------------------------------
         */
 
-        Route::middleware('auth')->group(function () {
+        Route::middleware(['auth', 'role:agency'])->group(function () {
 
             Route::post('/logout', [AgencyLoginController::class, 'destroy'])
                 ->name('logout');
@@ -320,6 +335,15 @@ Route::prefix('agency')
 
             Route::post('/applications/{application}/move', [AgencyJobApplicationController::class, 'move'])
                 ->name('applications.move');
+
+            Route::post('/applications/{application}/interviews', [\App\Http\Controllers\Agency\InterviewController::class, 'store'])
+                ->name('applications.interviews.store');
+
+            Route::get('/applications/{application}/messages', [ConversationController::class, 'show'])
+                ->name('applications.messages');
+
+            Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage'])
+                ->name('conversations.messages.send');
 
             Route::get('/guards/{guardProfile}', [AgencyJobApplicationController::class, 'showGuardProfile'])
                 ->name('guard-profile.show');

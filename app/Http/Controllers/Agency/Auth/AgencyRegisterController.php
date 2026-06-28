@@ -36,8 +36,9 @@ class AgencyRegisterController extends Controller
                 'name' => $validated['contact_person'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => 'agency',
             ]);
+
+            $user->assignRole('agency');
 
             Agency::create([
                 'owner_id' => $user->id,

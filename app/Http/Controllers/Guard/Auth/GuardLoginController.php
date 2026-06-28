@@ -34,6 +34,16 @@ class GuardLoginController extends Controller
 
         $request->session()->regenerate();
 
+        if (! auth()->user()->hasRole('applicant')) {
+            Auth::logout();
+
+            return back()
+                ->withErrors([
+                    'email' => 'This account is not authorized to access the applicant portal.',
+                ])
+                ->onlyInput('email', 'account_type');
+        }
+
         return redirect()->route('applicant.dashboard');
     }
 

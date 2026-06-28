@@ -70,7 +70,12 @@
                 </div>
 
                 <div class="flex items-center gap-2 cursor-pointer" @click="openDetails({{ $job->id }})">
-                    <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Apply Now</span>
+                    <template x-if="isApplied({{ $job->id }})">
+                        <span class="text-xs font-bold text-green-600 uppercase tracking-wider">Applied</span>
+                    </template>
+                    <template x-if="!isApplied({{ $job->id }})">
+                        <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Apply Now</span>
+                    </template>
                     <x-framework.icon name="arrow-right" class="h-4 w-4 text-amber-600" />
                 </div>
             </div>

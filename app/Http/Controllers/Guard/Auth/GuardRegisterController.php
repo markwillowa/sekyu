@@ -44,6 +44,8 @@ class GuardRegisterController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        $user->assignRole('applicant');
+
         GuardProfile::create([
             'user_id' => $user->id,
             'first_name' => $validated['first_name'],

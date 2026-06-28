@@ -52,4 +52,19 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(JobPost::class, 'saved_jobs')->withTimestamps();
     }
+
+    public function interviews(): HasMany
+    {
+        return $this->hasMany(Interview::class, 'interviewer_id');
+    }
+
+    public function conversationParticipants(): HasMany
+    {
+        return $this->hasMany(ConversationParticipant::class);
+    }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_participants');
+    }
 }

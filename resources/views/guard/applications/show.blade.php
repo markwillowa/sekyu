@@ -1,13 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="bg-slate-50 py-10">
+    <section class="bg-slate-50 py-10" x-data="messaging({{ $application->id }})">
         <div class="mx-auto max-w-7xl px-6">
             <x-framework.layout.page-header
                 title="Application Timeline"
                 description="Tracking your application for {{ $application->job->title }} at {{ $application->job->agency->name }}"
             >
                 <x-slot:actions>
+                    <x-framework.buttons.primary @click="openMessages()">
+                        Messages
+                    </x-framework.buttons.primary>
                     <x-framework.buttons.secondary href="{{ route('applicant.applications.index') }}">
                         Back to My Applications
                     </x-framework.buttons.secondary>
@@ -132,5 +135,124 @@
                 </div>
             </div>
         </div>
+
+        {{-- Messaging Drawer (Details-pane style) --}}
+        <div
+            x-show="showMessages"
+            x-cloak
+            class="fixed inset-0 z-[1000]"
+            style="display: none;"
+        >
+            {{-- Backdrop --}}
+            <div
+                x-show="showMessages"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-slate-900/30 backdrop-blur-[2px]"
+                @click="showMessages = false"
+            ></div>
+
+            {{-- Content Drawer --}}
+            <div
+                x-show="showMessages"
+                x-transition:enter="transition ease-out duration-500"
+                x-transition:enter-start="translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                x-transition:leave="transition ease-in duration-500"
+                x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="translate-x-full"
+                class="fixed inset-y-0 right-0 w-full md:w-[85%] lg:w-[70%] bg-white shadow-2xl flex flex-col overflow-hidden"
+            >
+                <div class="flex-1 overflow-hidden h-full" x-html="messagesHtml" x-show="!loading"></div>
+                <div x-show="loading" class="flex-1 flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('messaging', (applicationId) => ({
+            showMessages: false,
+            loading: false,
+            messagesHtml: '',
+            newMessage: '',
+            sending: false,
+            conversationId: null,
+
+            async openMessages() {
+                this.showMessages = true;
+                if (!this.messagesHtml) {
+                    await this.loadMessages();
+                }
+            },
+
+            async loadMessages() {
+                this.loading = true;
+                try {
+                    const response = await fetch(`/applicant/applications/${applicationId}/messages`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    this.messagesHtml = data.html;
+                    this.conversationId = data.conversation_id;
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                } catch (e) {
+                    console.error('Failed to load messages', e);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async sendMessage() {
+                if (!this.newMessage.trim() || this.sending) return;
+
+                this.sending = true;
+                try {
+                    const response = await fetch(`/applicant/conversations/${this.conversationId}/messages`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ message: this.newMessage })
+                    });
+                    const data = await response.json();
+                    this.messagesHtml = data.html;
+                    this.newMessage = '';
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                } catch (e) {
+                    console.error('Failed to send message', e);
+                } finally {
+                    this.sending = false;
+                }
+            },
+
+            scrollToBottom() {
+                const container = document.getElementById(`messages-container-${this.conversationId}`);
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            }
+        }));
+    });
+</script>
+@endpush

@@ -144,12 +144,23 @@
                         Not accepting applications yet
                     </div>
                 @else
-                    <form action="{{ route('jobs.apply', $job) }}" method="POST" class="w-full md:w-auto">
-                        @csrf
-                        <x-framework.buttons.primary type="submit" class="w-full md:w-auto px-8 md:px-12 py-3 md:py-4 rounded-2xl text-base md:text-lg font-black shadow-lg shadow-amber-200">
+                    {{-- Session Application Status (for immediate feedback) --}}
+                    <template x-if="isApplied({{ $job->id }})">
+                        <div class="flex items-center gap-2 text-green-600 font-bold bg-green-50 px-6 py-3 rounded-2xl border border-green-100">
+                            <x-framework.icon name="check-circle" class="h-6 w-6" />
+                            Application Submitted!
+                        </div>
+                    </template>
+
+                    {{-- Apply Button --}}
+                    <template x-if="!isApplied({{ $job->id }})">
+                        <x-framework.buttons.primary
+                            @click="apply({{ $job->id }})"
+                            class="w-full md:w-auto px-8 md:px-12 py-3 md:py-4 rounded-2xl text-base md:text-lg font-black shadow-lg shadow-amber-200"
+                        >
                             Apply Now
                         </x-framework.buttons.primary>
-                    </form>
+                    </template>
                 @endif
             </div>
         </div>

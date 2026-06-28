@@ -99,6 +99,18 @@
             </div>
 
             <div class="mt-10">
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-slate-900 mb-6">Upcoming Interviews</h2>
+                    <x-framework.calendar.seven-day
+                        :start-date="$startDate"
+                        :interviews="$calendarInterviews"
+                        :next-url="$nextUrl"
+                        :prev-url="$prevUrl"
+                    />
+                </div>
+            </div>
+
+            <div class="mt-10">
                 @if($latestJobPosts->isEmpty())
                     <x-framework.layout.empty-state
                         title="No Job Posts Yet"

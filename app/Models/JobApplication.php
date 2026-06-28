@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class JobApplication extends Model
 {
@@ -43,5 +44,15 @@ class JobApplication extends Model
     public function histories(): HasMany
     {
         return $this->hasMany(JobApplicationHistory::class);
+    }
+
+    public function interviews(): HasMany
+    {
+        return $this->hasMany(Interview::class);
+    }
+
+    public function conversation(): HasOne
+    {
+        return $this->hasOne(Conversation::class);
     }
 }

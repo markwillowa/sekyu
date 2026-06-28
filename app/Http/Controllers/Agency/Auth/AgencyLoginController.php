@@ -35,7 +35,7 @@ class AgencyLoginController extends Controller
 
                 return back()
                     ->withErrors([
-                        'email' => 'This account is not registered as an agency.',
+                        'email' => 'This account is not authorized to access the agency portal.',
                     ])
                     ->onlyInput('email', 'account_type');
             }

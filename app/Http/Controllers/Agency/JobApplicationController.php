@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Agency;
 
 use App\Http\Controllers\Controller;
+use App\Models\MasterInterviewType;
 use App\Models\JobApplication;
 use App\Models\GuardProfile;
 use App\Notifications\ApplicationStepChanged;
@@ -95,14 +96,16 @@ class JobApplicationController extends Controller
                 ]);
             },
             'currentStep',
+            'interviews.interviewer',
             'histories.step',
             'histories.user',
         ]);
 
         $workflowSteps = $application->job->workflowTemplate->steps;
         $profileCompletion = $completionService->calculate($application->applicant->guardProfile);
+        $interviewTypes = MasterInterviewType::where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('agency.applications.show', compact('application', 'workflowSteps', 'profileCompletion'));
+        return view('agency.applications.show', compact('application', 'workflowSteps', 'profileCompletion', 'interviewTypes'));
     }
 
     public function move(Request $request, JobApplication $application)

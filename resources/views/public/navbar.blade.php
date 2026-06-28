@@ -288,7 +288,7 @@
             @endguest
 
             @auth
-                @if(auth()->user()->role === 'agency')
+                @if(auth()->user()->hasRole('agency'))
                     <a href="{{ route('agency.dashboard') }}" class="block rounded-lg px-4 py-3 font-medium text-slate-700 hover:bg-slate-100">
                         Agency Dashboard
                     </a>

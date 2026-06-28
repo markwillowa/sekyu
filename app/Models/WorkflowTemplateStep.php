@@ -34,4 +34,9 @@ class WorkflowTemplateStep extends Model
     {
         return $this->hasMany(JobApplicationHistory::class, 'workflow_step_id');
     }
+
+    public function interviews(): HasMany
+    {
+        return $this->hasMany(Interview::class, 'workflow_step_id');
+    }
 }

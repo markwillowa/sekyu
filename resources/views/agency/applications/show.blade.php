@@ -1,13 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="bg-slate-50 py-10">
+    <section class="bg-slate-50 py-10" x-data="messaging({{ $application->id }})">
         <div class="mx-auto max-w-7xl px-6">
             <x-framework.layout.page-header
                 title="Application Details"
                 description="Manage application for {{ $application->applicant->name }} for {{ $application->job->title }}"
             >
                 <x-slot:actions>
+                    <x-framework.buttons.primary @click="openMessages()">
+                        Messages
+                    </x-framework.buttons.primary>
                     <x-framework.buttons.primary href="{{ route('agency.applications.kanban', ['job_post_id' => $application->job_id]) }}">
                         View in Kanban
                     </x-framework.buttons.primary>
@@ -202,46 +205,296 @@
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hidden" id="documents-tab">
                         <p class="text-sm text-slate-500 italic">No documents found.</p>
                     </div>
+                </div>
+            </div>
 
-                    {{-- Activity History Feed --}}
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 class="text-lg font-bold text-slate-900 mb-6">Activity Logs</h3>
-                        <div class="flow-root">
-                            <ul role="list" class="-mb-8">
-                                @foreach($application->histories as $history)
-                                    <li>
-                                        <div class="relative pb-8">
-                                            @if(!$loop->last)
-                                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-200" aria-hidden="true"></span>
-                                            @endif
-                                            <div class="relative flex space-x-3">
+            <div class="mt-8 space-y-8">
+                {{-- Interviews Section - Now occupying entire row --}}
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-900">Interviews</h3>
+                        @if($application->currentStep->type === 'interview')
+                            <button
+                                x-data=""
+                                x-on:click="$dispatch('open-modal', 'schedule-interview')"
+                                class="text-sm font-bold text-blue-600 hover:text-blue-700"
+                            >
+                                + Schedule Interview
+                            </button>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @forelse($application->interviews as $interview)
+                            <div class="p-6 rounded-xl border border-slate-100 bg-slate-50 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h4 class="font-bold text-slate-900">{{ $interview->title }}</h4>
+                                            <p class="text-xs text-slate-500">{{ $interview->scheduled_at->format('M d, Y @ h:i A') }} ({{ $interview->duration_minutes }} mins)</p>
+                                        </div>
+                                        <x-framework.feedback.badge :color="$interview->status === 'scheduled' ? 'blue' : 'gray'">
+                                            {{ ucfirst($interview->status) }}
+                                        </x-framework.feedback.badge>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4 text-xs mb-6">
+                                        <div>
+                                            <span class="text-slate-400 block uppercase font-bold tracking-tighter">Type</span>
+                                            <span class="text-slate-700">{{ $interview->interviewType?->name ?? $interview->type }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-slate-400 block uppercase font-bold tracking-tighter">Interviewer</span>
+                                            <span class="text-slate-700">{{ $interview->interviewer->name }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4 pt-4 border-t border-slate-200/50">
+                                    @if($interview->meeting_url)
+                                        <a href="{{ $interview->meeting_url }}" target="_blank" class="text-xs text-blue-600 font-bold hover:underline flex items-center">
+                                            <x-framework.icon name="link" class="h-3 w-3 mr-1" />
+                                            Join Meeting
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('interviews.calendar', $interview) }}" class="text-xs text-slate-600 font-bold hover:underline flex items-center">
+                                        <x-framework.icon name="calendar" class="h-3 w-3 mr-1" />
+                                        Add to Calendar
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="lg:col-span-3 text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                <x-framework.icon name="calendar" class="h-10 w-10 text-slate-200 mx-auto mb-2" />
+                                <p class="text-sm text-slate-500 italic">No interviews scheduled yet.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Activity History Feed --}}
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-6">Activity Logs</h3>
+                    <div class="flow-root">
+                        <ul role="list" class="-mb-8">
+                            @foreach($application->histories as $history)
+                                <li>
+                                    <div class="relative pb-8">
+                                        @if(!$loop->last)
+                                            <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-200" aria-hidden="true"></span>
+                                        @endif
+                                        <div class="relative flex space-x-3">
+                                            <div>
+                                                <span class="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center ring-8 ring-white">
+                                                    <x-framework.icon name="check" class="h-5 w-5 text-blue-600" />
+                                                </span>
+                                            </div>
+                                            <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                                                 <div>
-                                                    <span class="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center ring-8 ring-white">
-                                                        <x-framework.icon name="check" class="h-5 w-5 text-blue-600" />
-                                                    </span>
+                                                    <p class="text-sm text-slate-500">
+                                                        Moved to <span class="font-bold text-slate-900">{{ $history->step->name }}</span>
+                                                        @if($history->notes)
+                                                            <span class="block mt-1 italic text-xs text-slate-400">"{{ $history->notes }}"</span>
+                                                        @endif
+                                                    </p>
                                                 </div>
-                                                <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                                    <div>
-                                                        <p class="text-sm text-slate-500">
-                                                            Moved to <span class="font-bold text-slate-900">{{ $history->step->name }}</span>
-                                                            @if($history->notes)
-                                                                <span class="block mt-1 italic text-xs text-slate-400">"{{ $history->notes }}"</span>
-                                                            @endif
-                                                        </p>
-                                                    </div>
-                                                    <div class="whitespace-nowrap text-right text-sm text-slate-500">
-                                                        <time datetime="{{ $history->completed_at }}">{{ $history->completed_at?->format('M d, H:i') ?? 'N/A' }}</time>
-                                                    </div>
+                                                <div class="whitespace-nowrap text-right text-sm text-slate-500">
+                                                    <time datetime="{{ $history->completed_at }}">{{ $history->completed_at?->format('M d, H:i') ?? 'N/A' }}</time>
                                                 </div>
                                             </div>
                                         </div>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
+
+        {{-- Messaging Drawer (Details-pane style) --}}
+        <div
+            x-show="showMessages"
+            x-cloak
+            class="fixed inset-0 z-[1000]"
+            style="display: none;"
+        >
+            {{-- Backdrop --}}
+            <div
+                x-show="showMessages"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-slate-900/30 backdrop-blur-[2px]"
+                @click="showMessages = false"
+            ></div>
+
+            {{-- Content Drawer --}}
+            <div
+                x-show="showMessages"
+                x-transition:enter="transition ease-out duration-500"
+                x-transition:enter-start="translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                x-transition:leave="transition ease-in duration-500"
+                x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="translate-x-full"
+                class="fixed inset-y-0 right-0 w-full md:w-[85%] lg:w-[70%] bg-white shadow-2xl flex flex-col overflow-hidden"
+            >
+                <div class="flex-1 overflow-hidden h-full" x-html="messagesHtml" x-show="!loading"></div>
+                <div x-show="loading" class="flex-1 flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
     </section>
+
+    <x-framework.feedback.modal name="schedule-interview" title="Schedule Interview">
+        <form action="{{ route('agency.applications.interviews.store', $application) }}" method="POST" class="space-y-6">
+            @csrf
+            <x-framework.forms.input
+                label="Interview Title"
+                name="title"
+                placeholder="e.g. Technical Interview"
+                value="Technical Interview"
+                required
+            />
+
+            <div class="grid grid-cols-2 gap-4">
+                <x-framework.forms.select
+                    label="Interview Type"
+                    name="interview_type_id"
+                    :options="$interviewTypes->pluck('name', 'id')"
+                    required
+                />
+
+                <x-framework.forms.select
+                    label="Interviewer"
+                    name="interviewer_id"
+                    :options="[auth()->id() => auth()->user()->name]"
+                    :selected="auth()->id()"
+                    required
+                />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <x-framework.forms.input
+                    label="Date & Time"
+                    name="scheduled_at"
+                    type="datetime-local"
+                    required
+                />
+
+                <x-framework.forms.input
+                    label="Duration (minutes)"
+                    name="duration_minutes"
+                    type="number"
+                    value="30"
+                    required
+                />
+            </div>
+
+            <x-framework.forms.input
+                label="Meeting URL / Location"
+                name="meeting_url"
+                placeholder="Link or address"
+            />
+
+            <x-framework.forms.textarea
+                label="Notes for Candidate"
+                name="notes"
+                placeholder="e.g. Bring original documents."
+            />
+
+            <div class="flex justify-end gap-3 pt-4">
+                <x-framework.buttons.secondary type="button" x-on:click="$dispatch('close-modal', 'schedule-interview')">
+                    Cancel
+                </x-framework.buttons.secondary>
+                <x-framework.buttons.primary type="submit">
+                    Save Interview
+                </x-framework.buttons.primary>
+            </div>
+        </form>
+    </x-framework.feedback.modal>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('messaging', (applicationId) => ({
+            showMessages: false,
+            loading: false,
+            messagesHtml: '',
+            newMessage: '',
+            sending: false,
+            conversationId: null,
+
+            async openMessages() {
+                this.showMessages = true;
+                if (!this.messagesHtml) {
+                    await this.loadMessages();
+                }
+            },
+
+            async loadMessages() {
+                this.loading = true;
+                try {
+                    const response = await fetch(`/agency/applications/${applicationId}/messages`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    this.messagesHtml = data.html;
+                    this.conversationId = data.conversation_id;
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                } catch (e) {
+                    console.error('Failed to load messages', e);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async sendMessage() {
+                if (!this.newMessage.trim() || this.sending) return;
+
+                this.sending = true;
+                try {
+                    const response = await fetch(`/agency/conversations/${this.conversationId}/messages`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ message: this.newMessage })
+                    });
+                    const data = await response.json();
+                    this.messagesHtml = data.html;
+                    this.newMessage = '';
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                } catch (e) {
+                    console.error('Failed to send message', e);
+                } finally {
+                    this.sending = false;
+                }
+            },
+
+            scrollToBottom() {
+                const container = document.getElementById(`messages-container-${this.conversationId}`);
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            }
+        }));
+    });
+</script>
+@endpush
