@@ -36,7 +36,8 @@ class JobController extends Controller
                 'workLocationType',
                 'salaryType',
                 'location'
-            ]);
+            ])
+            ->withCount('applications');
 
         // Search Filters
         if ($request->filled('q')) {
@@ -81,13 +82,19 @@ class JobController extends Controller
             case 'salary_low':
                 $query->orderBy('salary_min');
                 break;
+            case 'asc':
+                $query->orderBy('title');
+                break;
+            case 'desc':
+                $query->orderByDesc('title');
+                break;
             case 'newest':
             default:
                 $query->latest();
                 break;
         }
 
-        $jobs = $query->paginate(50)->withQueryString();
+        $jobs = $query->paginate(100)->withQueryString();
 
         // Filter data
         $employmentTypes = MasterEmploymentType::where('is_active', true)->orderBy('sort_order')->get();
@@ -98,8 +105,15 @@ class JobController extends Controller
 
         // Saved jobs for current user
         $savedJobs = collect();
+        $profileCompletion = 0;
         if (auth()->check()) {
-            $savedJobs = auth()->user()->savedJobs()
+            $user = auth()->user();
+            if ($user->hasRole('applicant')) {
+                $completionService = app(\App\Services\Guard\ProfileCompletionService::class);
+                $profileCompletion = $completionService->calculate($user->guardProfile)['percentage'];
+            }
+
+            $savedJobs = $user->savedJobs()
                 ->whereIn('job_status_id', $statusIds)
                 ->where(function ($q) {
                     $q->whereNull('expires_at')
@@ -116,6 +130,7 @@ class JobController extends Controller
                     'salaryType',
                     'location'
                 ])
+                ->withCount('applications')
                 ->get();
         }
 
@@ -140,7 +155,8 @@ class JobController extends Controller
                 'workLocationType',
                 'salaryType',
                 'location'
-            ]);
+            ])
+            ->withCount('applications');
 
         // If we are on a search results page or have active filters, we might want to pick from the filtered query instead.
         // But the user said "4 random jobs are on top", implying a global feature or something.
@@ -159,6 +175,6 @@ class JobController extends Controller
             $randomJobs = $randomJobs->concat($additionalJobs);
         }
 
-        return view('public.jobs.index', compact('jobs', 'randomJobs', 'employmentTypes', 'locations', 'isFiltered', 'savedJobs'));
+        return view('public.jobs.index', compact('jobs', 'randomJobs', 'employmentTypes', 'locations', 'isFiltered', 'savedJobs', 'profileCompletion'));
     }
 }

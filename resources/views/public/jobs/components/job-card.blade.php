@@ -9,6 +9,16 @@
         <div class="absolute top-0 left-0 bg-amber-400 text-white text-[10px] font-black uppercase tracking-tighter px-3 py-1 rounded-br-xl">
             Featured
         </div>
+    @else
+        @if($job->agency->is_verified)
+            <div class="absolute top-0 left-0 bg-green-500 text-white text-[10px] font-black uppercase tracking-tighter px-3 py-1 rounded-br-xl">
+                Verified
+            </div>
+        @else
+            <div class="absolute top-0 left-0 bg-slate-400 text-white text-[10px] font-black uppercase tracking-tighter px-3 py-1 rounded-br-xl">
+                Not Verified
+            </div>
+        @endif
     @endif
 
     {{-- Save Button --}}
@@ -44,7 +54,13 @@
                 {{ Str::limit(strip_tags($job->description), 160) }}
             </div>
 
-            <div class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+        <div class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                @if($job->min_profile_completion > 0)
+                    <span class="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 text-[11px] font-bold border border-blue-100">
+                        <x-framework.icon name="user-circle" class="h-3.5 w-3.5" />
+                        {{ $job->min_profile_completion }}% Profile Required
+                    </span>
+                @endif
                 <span class="flex items-center gap-1.5 text-slate-500">
                     <x-framework.icon name="map-pin" class="h-4 w-4 text-slate-400" />
                     {{ $job->location?->name ?? $job->city }}
@@ -65,7 +81,7 @@
                     </span>
                     <div class="h-1 w-1 rounded-full bg-slate-200"></div>
                     <span class="text-[11px] text-slate-400 font-medium">
-                        12 Applicants
+                        {{ $job->applications_count ?? 0 }} Applicants
                     </span>
                 </div>
 

@@ -4,6 +4,7 @@
     <div x-data="jobIndex({
         savedJobIds: {{ auth()->check() ? $savedJobs->pluck('id')->toJson() : '[]' }},
         appliedJobIds: {{ auth()->check() ? auth()->user()->jobApplications->pluck('job_id')->toJson() : '[]' }},
+        profileCompletion: {{ $profileCompletion ?? 0 }},
         isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
         loginUrl: '{{ route('login') }}',
         csrfToken: '{{ csrf_token() }}'
@@ -183,6 +184,7 @@
             mobileFiltersOpen: false,
             showDetailsPane: false,
             activeJob: null,
+            profileCompletion: config.profileCompletion || 0,
             savedJobIds: config.savedJobIds || [],
             appliedJobIds: config.appliedJobIds || [], // Initialized with jobs already applied for
 

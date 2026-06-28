@@ -45,6 +45,12 @@
             </div>
 
             <div class="mt-4 flex flex-wrap gap-4 items-center">
+                @if($job->min_profile_completion > 0)
+                    <span class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-600 text-white text-[11px] font-black tracking-wide">
+                        <x-framework.icon name="user-circle" class="h-3.5 w-3.5" />
+                        {{ $job->min_profile_completion }}% Profile Required
+                    </span>
+                @endif
                 <span class="flex items-center gap-1.5 text-slate-500 text-sm font-medium">
                     <x-framework.icon name="map-pin" class="h-4.5 w-4.5 text-amber-400" />
                     {{ $job->location?->name ?? $job->city }}
@@ -69,8 +75,13 @@
                     </div>
                     <div class="h-8 w-px bg-slate-100"></div>
                     <div class="flex flex-col">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">Active Jobs</span>
-                        <span class="mt-1 text-xs font-bold text-slate-700 text-center">{{ $job->agency->active_jobs_count ?? 1 }} Listing</span>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Applicants</span>
+                        <span class="mt-1 text-xs font-bold text-slate-700">{{ $job->applications_count ?? 0 }} Applicants</span>
+                    </div>
+                    <div class="h-8 w-px bg-slate-100"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Posted</span>
+                        <span class="mt-1 text-xs font-bold text-slate-700">{{ $job->published_at ? $job->published_at->diffForHumans() : 'Recently' }}</span>
                     </div>
                 </div>
 

@@ -14,6 +14,7 @@ class HomeController extends Controller
         $activeStatusIds = $activeStatus->pluck('id')->toArray();
 
         $query = JobPost::with(['agency', 'employmentType', 'workLocationType', 'salaryType'])
+            ->withCount('applications')
             ->whereIn('job_status_id', $activeStatusIds)
             ->where(function ($q) {
                 $q->whereNull('expires_at')
@@ -29,6 +30,15 @@ class HomeController extends Controller
             $jobs = $query->inRandomOrder()->take(4)->get();
         }
 
-        return view('welcome', compact('jobs'));
+        $profileCompletion = 0;
+        if (auth()->check()) {
+            $user = auth()->user();
+            if ($user->hasRole('applicant')) {
+                $completionService = app(\App\Services\Guard\ProfileCompletionService::class);
+                $profileCompletion = $completionService->calculate($user->guardProfile)['percentage'];
+            }
+        }
+
+        return view('welcome', compact('jobs', 'profileCompletion'));
     }
 }

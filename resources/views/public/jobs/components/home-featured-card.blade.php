@@ -10,10 +10,15 @@
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
 
         {{-- Featured Badge --}}
-        <div class="absolute top-4 left-4">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-400 text-slate-900 uppercase tracking-wider">
+        <div class="absolute top-4 left-4 flex flex-col gap-2">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-400 text-slate-900 uppercase tracking-wider w-fit">
                 Featured
             </span>
+            @if($job->min_profile_completion > 0)
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white uppercase tracking-wider w-fit">
+                    {{ $job->min_profile_completion }}% Profile
+                </span>
+            @endif
         </div>
 
         {{-- Salary Badge --}}
@@ -60,9 +65,14 @@
             </p>
 
             <div class="mt-auto pt-6 flex items-center justify-between">
-                <span class="text-xs text-slate-400">
-                    {{ $job->published_at ? $job->published_at->diffForHumans() : 'Recently' }}
-                </span>
+                <div class="flex flex-col gap-0.5">
+                    <span class="text-[10px] text-slate-400 font-medium">
+                        {{ $job->published_at ? $job->published_at->diffForHumans() : 'Recently' }}
+                    </span>
+                    <span class="text-[10px] text-slate-400 font-medium">
+                        {{ $job->applications_count ?? 0 }} Applicants
+                    </span>
+                </div>
 
                 <a
                     href="{{ route('jobs.index', ['job' => $job->id]) }}"

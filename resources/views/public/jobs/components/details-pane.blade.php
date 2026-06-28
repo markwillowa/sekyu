@@ -143,6 +143,27 @@
                         <x-framework.icon name="exclamation-circle" class="h-6 w-6" />
                         Not accepting applications yet
                     </div>
+                @elseif(auth()->check() && (auth()->user()->hasRole('agency') || auth()->user()->hasRole('admin')))
+                    <div class="flex items-center gap-2 text-slate-600 font-bold bg-slate-100 px-6 py-3 rounded-2xl border border-slate-200">
+                        <x-framework.icon name="information-circle" class="h-6 w-6" />
+                        Only applicants can apply for jobs
+                    </div>
+                @elseif($job->min_profile_completion > 0 && (!auth()->check() || (auth()->check() && $profileCompletion < $job->min_profile_completion)))
+                    <div class="flex flex-col gap-2 w-full md:w-auto">
+                        <div class="flex items-center gap-2 text-blue-600 font-bold bg-blue-50 px-6 py-3 rounded-2xl border border-blue-100">
+                            <x-framework.icon name="information-circle" class="h-6 w-6" />
+                            <span>{{ $job->min_profile_completion }}% Profile Completion Required</span>
+                        </div>
+                        @if(auth()->check())
+                            <a href="{{ route('applicant.profile.show') }}" class="text-xs text-blue-600 hover:underline font-bold text-center">
+                                Your profile is only {{ $profileCompletion }}% complete. Complete your profile to apply.
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="text-xs text-blue-600 hover:underline font-bold text-center">
+                                Login to check your profile completion.
+                            </a>
+                        @endif
+                    </div>
                 @else
                     {{-- Session Application Status (for immediate feedback) --}}
                     <template x-if="isApplied({{ $job->id }})">

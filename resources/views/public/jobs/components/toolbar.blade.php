@@ -30,6 +30,8 @@
             <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest</option>
             <option value="salary_high" {{ request('sort') == 'salary_high' ? 'selected' : '' }}>Highest Salary</option>
             <option value="salary_low" {{ request('sort') == 'salary_low' ? 'selected' : '' }}>Lowest Salary</option>
+            <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Ascending (A-Z)</option>
+            <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Descending (Z-A)</option>
         </x-framework.forms.select>
 
         {{-- Mobile Filter Button --}}

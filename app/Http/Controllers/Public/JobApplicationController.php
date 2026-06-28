@@ -15,6 +15,13 @@ class JobApplicationController extends Controller
     public function store(Request $request, JobPost $jobPost, ProfileCompletionService $completionService)
     {
         $user = auth()->user();
+        if ($user->hasRole('agency') || $user->hasRole('admin')) {
+            $message = "Only candidates with an applicant profile can apply for jobs.";
+            if ($request->expectsJson()) {
+                return response()->json(['error' => $message], 403);
+            }
+            return back()->with('error', $message);
+        }
 
         // Check profile completion requirement
         if ($jobPost->min_profile_completion > 0) {
