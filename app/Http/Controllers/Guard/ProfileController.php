@@ -779,7 +779,12 @@ class ProfileController extends Controller
             'guardProfile.languages',
             'guardProfile.trainings',
             'guardProfile.clearances',
+            'guardProfile.medicals',
             'guardProfile.identifications',
+            'guardProfile.emergencyContacts',
+            'guardProfile.references',
+            'guardProfile.availability',
+            'guardProfile.firearmQualification',
             'guardProfile.specializations',
         ]);
 
@@ -799,7 +804,12 @@ class ProfileController extends Controller
             'languages' => $profile?->languages ?? collect(),
             'trainings' => $profile?->trainings ?? collect(),
             'clearances' => $profile?->clearances ?? collect(),
+            'medicals' => $profile?->medicals ?? collect(),
             'identifications' => $profile?->identifications ?? collect(),
+            'emergencyContacts' => $profile?->emergencyContacts ?? collect(),
+            'references' => $profile?->references ?? collect(),
+            'availability' => $profile?->availability,
+            'firearmQualification' => $profile?->firearmQualification,
             'specializations' => $profile?->specializations ?? collect(),
         ]);
     }

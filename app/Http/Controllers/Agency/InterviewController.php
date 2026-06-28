@@ -28,10 +28,7 @@ class InterviewController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $interviewType = MasterInterviewType::find($validated['interview_type_id']);
-
         $application->interviews()->create(array_merge($validated, [
-            'type' => $interviewType->name,
             'workflow_step_id' => $application->current_workflow_step_id,
             'status' => 'scheduled',
         ]));

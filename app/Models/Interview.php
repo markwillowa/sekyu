@@ -13,7 +13,6 @@ class Interview extends Model
         'interviewer_id',
         'interview_type_id',
         'title',
-        'type',
         'scheduled_at',
         'duration_minutes',
         'location',

@@ -112,19 +112,35 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
                     workflow_step_id: stepId,
                     notes: 'Moved via Kanban board'
                 })
-            }).then(response => {
-                if (response.ok) {
-                    window.location.reload();
+            }).then(response => response.json())
+            .then(data => {
+                if (data.next_action) {
+                    // If specialized action is needed, redirect to the application show page
+                    // The backend will set the flash message for trigger_modal
+                    window.location.href = `/agency/applications/${applicationId}?trigger_modal=` + getModalName(data.next_action);
                 } else {
-                    alert('Failed to move applicant. Please try again.');
+                    window.location.reload();
                 }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Failed to move applicant. Please try again.');
             });
+        }
+
+        function getModalName(action) {
+            switch(action) {
+                case 'interview': return 'schedule-interview';
+                case 'job_offer': return 'create-job-offer';
+                case 'document_request': return 'request-documents';
+                default: return '';
+            }
         }
 
         // Add event listeners for native drag and drop since I used onurl- prefix to avoid issues if any

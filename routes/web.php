@@ -350,9 +350,15 @@ Route::prefix('agency')
 
             Route::post('/applications/{application}/move', [AgencyJobApplicationController::class, 'move'])
                 ->name('applications.move');
+            Route::get('/applications/{application}/move', function ($application) {
+                return redirect()->route('agency.applications.show', $application);
+            });
 
             Route::post('/applications/{application}/interviews', [\App\Http\Controllers\Agency\InterviewController::class, 'store'])
                 ->name('applications.interviews.store');
+            Route::get('/applications/{application}/interviews', function ($application) {
+                return redirect()->route('agency.applications.show', $application);
+            });
 
             Route::get('/applications/{application}/messages', [ConversationController::class, 'show'])
                 ->name('applications.messages');
@@ -362,12 +368,21 @@ Route::prefix('agency')
 
             Route::post('/applications/{application}/offers', [AgencyJobOfferController::class, 'store'])
                 ->name('applications.offers.store');
+            Route::get('/applications/{application}/offers', function ($application) {
+                return redirect()->route('agency.applications.show', $application);
+            });
 
             Route::post('/offers/{offer}/send', [AgencyJobOfferController::class, 'send'])
                 ->name('offers.send');
+            Route::get('/offers/{offer}/send', function ($offer) {
+                return redirect()->route('agency.dashboard');
+            });
 
             Route::post('/offers/{offer}/upload-pdf', [AgencyJobOfferController::class, 'uploadPdf'])
                 ->name('offers.upload-pdf');
+            Route::get('/offers/{offer}/upload-pdf', function ($offer) {
+                return redirect()->route('agency.dashboard');
+            });
 
             Route::get('/guards/{guardProfile}', [AgencyJobApplicationController::class, 'showGuardProfile'])
                 ->name('guard-profile.show');

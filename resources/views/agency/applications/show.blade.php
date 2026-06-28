@@ -1,7 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="bg-slate-50 py-10" x-data="messaging({{ $application->id }})">
+    <section class="bg-slate-50 py-10" x-data="messaging({{ $application->id }})" x-init="
+        @if(session('trigger_modal'))
+            $dispatch('open-modal', '{{ session('trigger_modal') }}');
+        @elseif(request('trigger_modal'))
+            $dispatch('open-modal', '{{ request('trigger_modal') }}');
+        @endif
+    ">
         <div class="mx-auto max-w-7xl px-6">
             <x-framework.layout.page-header
                 title="Application Details"
@@ -376,7 +382,7 @@
                                     <div class="grid grid-cols-2 gap-4 text-xs mb-6">
                                         <div>
                                             <span class="text-slate-400 block uppercase font-bold tracking-tighter">Type</span>
-                                            <span class="text-slate-700">{{ $interview->interviewType?->name ?? $interview->type }}</span>
+                                            <span class="text-slate-700">{{ $interview->interviewType?->name ?? 'N/A' }}</span>
                                         </div>
                                         <div>
                                             <span class="text-slate-400 block uppercase font-bold tracking-tighter">Interviewer</span>
@@ -610,6 +616,34 @@
                 </x-framework.buttons.secondary>
                 <x-framework.buttons.primary type="submit">
                     Generate Draft
+                </x-framework.buttons.primary>
+            </div>
+        </form>
+    </x-framework.feedback.modal>
+
+    <x-framework.feedback.modal name="request-documents" title="Request Documents">
+        <form action="{{ route('agency.applications.move', $application) }}" method="POST" class="space-y-6">
+            @csrf
+            <input type="hidden" name="workflow_step_id" value="{{ $application->current_workflow_step_id }}">
+
+            <p class="text-sm text-slate-600 mb-4">
+                Specify which documents you need the applicant to upload. They will be notified of this request.
+            </p>
+
+            <x-framework.forms.textarea
+                label="Requested Documents"
+                name="notes"
+                placeholder="e.g. NBI Clearance, SSS ID, PhilHealth ID..."
+                rows="4"
+                required
+            />
+
+            <div class="flex justify-end gap-3 pt-4">
+                <x-framework.buttons.secondary type="button" x-on:click="$dispatch('close-modal', 'request-documents')">
+                    Cancel
+                </x-framework.buttons.secondary>
+                <x-framework.buttons.primary type="submit">
+                    Send Request
                 </x-framework.buttons.primary>
             </div>
         </form>

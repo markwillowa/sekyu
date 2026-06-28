@@ -125,30 +125,48 @@ class JobApplicationController extends Controller
 
         $newStepId = $request->workflow_step_id;
 
-        // Check if step belongs to the job's workflow template
         $workflowTemplate = $application->job->workflowTemplate;
-        if (!$workflowTemplate->steps()->where('id', $newStepId)->exists()) {
+        $newStep = $workflowTemplate->steps()->find($newStepId);
+
+        if (!$newStep) {
             return back()->with('error', 'Invalid workflow step.');
         }
 
-        DB::transaction(function () use ($application, $newStepId, $request) {
+        DB::transaction(function () use ($application, $newStep, $request) {
             $application->update([
-                'current_workflow_step_id' => $newStepId,
+                'current_workflow_step_id' => $newStep->id,
             ]);
 
             $application->histories()->create([
-                'workflow_step_id' => $newStepId,
+                'workflow_step_id' => $newStep->id,
                 'updated_by' => auth()->id(),
-                'notes' => $request->notes ?? 'Moved to next step.',
+                'notes' => $request->notes ?? 'Moved to ' . $newStep->name . '.',
                 'completed_at' => now(),
             ]);
 
             // Notify Guard
-            $newStep = $application->job->workflowTemplate->steps()->find($newStepId);
             $application->applicant->notify(new ApplicationStepChanged($application, $newStep->name));
         });
 
-        return back()->with('success', 'Applicant moved successfully.');
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Applicant moved successfully.',
+                'next_action' => $newStep->type !== 'normal' ? $newStep->type : null,
+            ]);
+        }
+
+        $redirect = back()->with('success', 'Applicant moved successfully.');
+
+        if ($newStep->type !== 'normal') {
+            $redirect->with('trigger_modal', match($newStep->type) {
+                'interview' => 'schedule-interview',
+                'job_offer' => 'create-job-offer',
+                'document_request' => 'request-documents',
+                default => null
+            });
+        }
+
+        return $redirect;
     }
 
     public function showGuardProfile(GuardProfile $guardProfile, ProfileCompletionService $completionService)

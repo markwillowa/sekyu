@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             MasterDataSeeder::class,
+            MasterInterviewTypeSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
             AgencySeeder::class,

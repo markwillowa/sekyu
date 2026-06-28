@@ -95,7 +95,7 @@
                             @endif
                             <a href="{{ route('interviews.calendar', $interview) }}" class="flex items-center text-[10px] text-slate-500 font-bold hover:text-slate-700">
                                 <x-framework.icon name="calendar" class="h-3 w-3 mr-1" />
-                                Add to Cal
+                                Add to Calendar
                             </a>
                         </div>
                     </div>
